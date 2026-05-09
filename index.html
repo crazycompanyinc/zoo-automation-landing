@@ -46,28 +46,10 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
 .nav-cta:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,255,136,0.25); }
 .mobile-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.3rem; cursor: pointer; }
 
-/* ── Hero ── */
-.hero { position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden; background: radial-gradient(ellipse at 70% 50%, rgba(0,255,136,0.04) 0%, transparent 60%), radial-gradient(ellipse at 30% 80%, rgba(79,143,255,0.03) 0%, transparent 50%); }
-#three-hero { position: absolute; right: 0; top: 0; width: 55%; height: 100%; z-index: 0; }
-.hero-content { position: relative; z-index: 2; max-width: 1380px; margin: 0 auto; width: 100%; padding: 100px 48px 80px; }
-.hero-inner { max-width: 640px; }
-.hero-badge { display: inline-flex; align-items: center; gap: 10px; padding: 7px 16px; background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.12); border-radius: 100px; font-size: 0.68rem; font-weight: 700; color: var(--accent); font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 32px; }
-.hero-badge .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 2s ease-in-out infinite; }
-@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
-.hero h1 { font-size: clamp(48px, 6vw, 88px); font-weight: 900; line-height: 1.02; letter-spacing: -0.05em; margin-bottom: 28px; color: var(--text); }
-.hero h1 .accent { background: linear-gradient(135deg, var(--accent) 0%, var(--cyan) 60%, var(--blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.hero-desc { font-size: 1.1rem; color: var(--text2); line-height: 1.8; max-width: 500px; margin-bottom: 40px; }
-.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 28px; border: 1px solid transparent; border-radius: 10px; font-size: 0.92rem; font-weight: 700; font-family: inherit; line-height: 1.2; cursor: pointer; transition: all 0.3s var(--ease); text-decoration: none; }
-.btn-primary { background: var(--accent); color: var(--bg); }
-.btn-primary:hover { background: var(--accent2); transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,255,136,0.25); }
-.btn-secondary { background: rgba(255,255,255,0.04); color: var(--text); border-color: var(--border2); }
-.btn-secondary:hover { background: rgba(255,255,255,0.08); transform: translateY(-3px); }
-.hero-stats { display: flex; align-items: center; gap: 28px; }
-.hs-num { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; color: var(--text); line-height: 1; }
-.hs-num em { color: var(--accent); font-style: normal; }
-.hs-label { font-size: 0.68rem; color: var(--text3); margin-top: 4px; }
-.hs-divider { width: 1px; height: 28px; background: var(--border); }
+/* ── Hero — Solo el robot ── */
+.hero { position: relative; width: 100%; height: 70vh; min-height: 500px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+#three-hero { position: absolute; inset: 0; z-index: 0; }
+.hero-hint { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 2; font-family: var(--mono); font-size: 0.65rem; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; }
 
 /* ── Social Proof ── */
 .sp-bar { padding: 32px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
@@ -237,30 +219,10 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
   <button class="mobile-toggle" onclick="var n=document.querySelector('.nav-links');n.style.display=n.style.display==='flex'?'none':'flex';n.style.cssText='flex-direction:column;position:absolute;top:64px;left:0;right:0;background:rgba(8,9,13,0.95);padding:16px;border-bottom:1px solid var(--border)'">☰</button>
 </nav>
 
-<!-- Hero -->
+<!-- Hero — Solo el robot -->
 <section class="hero">
   <div id="three-hero"></div>
-  <div class="hero-content">
-    <div class="hero-inner">
-      <div class="hero-badge"><div class="pulse"></div> Live — 29 AI Agents Running</div>
-      <h1>
-        Describe what you need.<br>
-        <span class="accent">Our agents build it.</span>
-      </h1>
-      <p class="hero-desc">AI agents that automate your business 24/7. From scraping to reporting, from lead gen to deployment. No code. No complexity. Just results.</p>
-      <div class="hero-actions">
-        <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-primary">Start Automating →</a>
-        <a href="#case" class="btn btn-secondary">See It In Action</a>
-      </div>
-      <div class="hero-stats">
-        <div><div class="hs-num">29</div><div class="hs-label">Active Agents</div></div>
-        <div class="hs-divider"></div>
-        <div><div class="hs-num">1,600<em>+</em></div><div class="hs-label">Tasks Done</div></div>
-        <div class="hs-divider"></div>
-        <div><div class="hs-num">99.7<em>%</em></div><div class="hs-label">Uptime</div></div>
-      </div>
-    </div>
-  </div>
+  <div class="hero-hint">Drag to rotate · Scroll to explore</div>
 </section>
 
 <!-- Social Proof -->
@@ -544,13 +506,13 @@ window.addEventListener('scroll',function(){var n=document.getElementById('nav')
   var dl2=new THREE.DirectionalLight(0x4f8fff,0.6);dl2.position.set(-3,2,-2);scene.add(dl2);
   var pl=new THREE.PointLight(0x00ff88,0.8,15);pl.position.set(1,2,3);scene.add(pl);
 
-  // Load Sphere Bot
+  // Load Sphere Bot — smaller, centered
   var model=null, loaded=false;
   var loader=new THREE.GLTFLoader();
   loader.load('models/sphere-bot.glb',function(gltf){
     model=gltf.scene;
-    model.scale.set(1.8,1.8,1.8);
-    model.position.set(0.3,-0.5,0);
+    model.scale.set(1.0,1.0,1.0);
+    model.position.set(0,-0.3,0);
     model.rotation.y=-0.3;
     model.traverse(function(child){
       if(child.isMesh){
@@ -564,20 +526,20 @@ window.addEventListener('scroll',function(){var n=document.getElementById('nav')
     scene.add(model);loaded=true;
   },undefined,function(){console.warn('Model load failed');});
 
-  // Fallback: glowing orb with rings
+  // Fallback: smaller glowing orb with rings
   var fallback=new THREE.Group();
-  var core=new THREE.Mesh(new THREE.IcosahedronGeometry(0.7,2),new THREE.MeshStandardMaterial({color:0x00ff88,metalness:0.8,roughness:0.2,emissive:0x00ff88,emissiveIntensity:0.3}));
+  var core=new THREE.Mesh(new THREE.IcosahedronGeometry(0.4,2),new THREE.MeshStandardMaterial({color:0x00ff88,metalness:0.8,roughness:0.2,emissive:0x00ff88,emissiveIntensity:0.3}));
   fallback.add(core);
-  var r1=new THREE.Mesh(new THREE.TorusGeometry(1.1,0.02,16,100),new THREE.MeshStandardMaterial({color:0x4f8fff,emissive:0x4f8fff,emissiveIntensity:0.5,transparent:true,opacity:0.6}));
+  var r1=new THREE.Mesh(new THREE.TorusGeometry(0.7,0.015,16,100),new THREE.MeshStandardMaterial({color:0x4f8fff,emissive:0x4f8fff,emissiveIntensity:0.5,transparent:true,opacity:0.6}));
   r1.rotation.x=Math.PI/2.5;fallback.add(r1);
-  var r2=new THREE.Mesh(new THREE.TorusGeometry(1.4,0.015,16,100),new THREE.MeshStandardMaterial({color:0x00ff88,emissive:0x00ff88,emissiveIntensity:0.3,transparent:true,opacity:0.4}));
+  var r2=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.01,16,100),new THREE.MeshStandardMaterial({color:0x00ff88,emissive:0x00ff88,emissiveIntensity:0.3,transparent:true,opacity:0.4}));
   r2.rotation.x=-Math.PI/3;r2.rotation.z=Math.PI/4;fallback.add(r2);
-  var pGeo=new THREE.BufferGeometry();var pCnt=150;var pPos=new Float32Array(pCnt*3);
-  for(var i=0;i<pCnt*3;i++)pPos[i]=(Math.random()-0.5)*8;
+  var pGeo=new THREE.BufferGeometry();var pCnt=100;var pPos=new Float32Array(pCnt*3);
+  for(var i=0;i<pCnt*3;i++)pPos[i]=(Math.random()-0.5)*6;
   pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
-  var pMat=new THREE.PointsMaterial({color:0x00ff88,size:0.03,transparent:true,opacity:0.5});
+  var pMat=new THREE.PointsMaterial({color:0x00ff88,size:0.025,transparent:true,opacity:0.5});
   var particles=new THREE.Points(pGeo,pMat);fallback.add(particles);
-  fallback.position.set(0.3,-0.5,0);scene.add(fallback);
+  fallback.position.set(0,-0.3,0);scene.add(fallback);
 
   // Mouse
   var mx=0,my=0;
@@ -587,15 +549,15 @@ window.addEventListener('scroll',function(){var n=document.getElementById('nav')
   function animate(){
     requestAnimationFrame(animate);t+=0.008;
     if(model&&loaded){
-      model.rotation.y=-0.3+Math.sin(t*0.4)*0.2+mx*0.1;
-      model.position.y=-0.5+Math.sin(t)*0.08;
+      model.rotation.y=-0.3+Math.sin(t*0.4)*0.15+mx*0.08;
+      model.position.y=-0.3+Math.sin(t)*0.05;
     }
     core.rotation.y=t*0.3;core.rotation.x=Math.sin(t*0.5)*0.2;
     r1.rotation.z=t*0.15;r2.rotation.z=-t*0.1;
     particles.rotation.y=t*0.02;
     pl.position.x=Math.sin(t)*3;pl.position.z=Math.cos(t)*3;
-    cam.position.x=mx*0.5;cam.position.y=0.5+my*0.3;
-    cam.lookAt(0.2,0,0);
+    cam.position.x=mx*0.3;cam.position.y=0.5+my*0.2;
+    cam.lookAt(0,0,0);
     ren.render(scene,cam);
   }
   animate();
