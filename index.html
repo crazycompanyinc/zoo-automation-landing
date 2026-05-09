@@ -4,22 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZOO — AI Agents That Run Your Business</title>
-<meta name="description" content="From $49/mo. AI agents that automate your business 24/7. No code. No complexity. Describe what you need, our agents build it.">
+<meta name="description" content="From $49/mo. AI agents that automate your business 24/7. No code. Describe what you need, our agents build it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="preload" as="style" onload="this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <style>
 :root {
-  --bg: #020204; --bg2: #07070c; --bg3: #0c0c14;
+  --bg: #010103; --bg2: #06060a; --bg3: #0c0c12;
   --surface: rgba(255,255,255,0.02); --surface2: rgba(255,255,255,0.04);
-  --border: rgba(255,255,255,0.05); --border2: rgba(255,255,255,0.1);
-  --text: #eef0f4; --text2: #6e7a94; --text3: #3a4258;
+  --border: rgba(255,255,255,0.04); --border2: rgba(255,255,255,0.08);
+  --text: #e8ecf4; --text2: #5e6a82; --text3: #2e3548;
   --accent: #00ff88; --accent2: #00cc6a;
-  --blue: #4f8fff; --purple: #a855f7; --orange: #ff6b35; --cyan: #06d6e0;
+  --blue: #4f8fff; --purple: #a855f7; --orange: #ff6b35; --cyan: #06d6e0; --pink: #ec4899;
   --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --mono: 'JetBrains Mono', monospace;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -28,205 +27,194 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; background: var(--bg); overflow-x: hidden; }
 body { font-family: var(--sans); color: var(--text); background: var(--bg); line-height: 1.6; -webkit-font-smoothing: antialiased; }
-::selection { background: rgba(0,255,136,0.25); color: var(--text); }
+::selection { background: rgba(0,255,136,0.2); }
 
-/* ── Overlays ── */
-.noise { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.025; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 512px; }
-.vignette { position: fixed; inset: 0; z-index: 9997; pointer-events: none; background: radial-gradient(ellipse at center, transparent 40%, rgba(2,2,4,0.8) 100%); }
-.cursor-glow { position: fixed; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,136,0.08) 0%, rgba(0,255,136,0.02) 30%, transparent 65%); pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); will-change: left,top; mix-blend-mode: screen; }
+/* ── Global Overlays ── */
+.noise { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.02; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 512px; }
+.vignette { position: fixed; inset: 0; z-index: 9997; pointer-events: none; background: radial-gradient(ellipse at center, transparent 35%, rgba(1,1,3,0.85) 100%); }
+.cursor-glow { position: fixed; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, rgba(0,255,136,0.015) 30%, transparent 65%); pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); will-change: left,top; mix-blend-mode: screen; }
 
 /* ── Nav ── */
-.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; background: rgba(2,2,4,0.6); backdrop-filter: blur(24px) saturate(200%); border-bottom: 1px solid transparent; transition: all 0.4s; }
-.nav.scrolled { background: rgba(2,2,4,0.92); border-bottom-color: var(--border); }
-.nav-logo { font-family: var(--mono); font-size: 1.2rem; font-weight: 700; color: var(--text); text-decoration: none; letter-spacing: -0.02em; }
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 44px; background: rgba(1,1,3,0.5); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid transparent; transition: all 0.4s; }
+.nav.scrolled { background: rgba(1,1,3,0.92); border-bottom-color: var(--border); }
+.nav-logo { font-family: var(--mono); font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
 .nav-logo em { color: var(--accent); font-style: normal; }
-.nav-links { display: flex; align-items: center; gap: 6px; }
-.nav-links a { color: var(--text2); text-decoration: none; font-size: 0.82rem; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: all 0.25s; position: relative; }
-.nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.04); }
-.nav-cta { display: inline-flex; align-items: center; padding: 10px 22px; background: var(--accent) !important; color: var(--bg) !important; border-radius: 8px; font-weight: 700; font-size: 0.82rem; text-decoration: none; transition: all 0.3s var(--ease) !important; }
-.nav-cta:hover { background: var(--accent2) !important; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,255,136,0.3); }
-.mobile-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; padding: 8px; }
+.nav-links { display: flex; align-items: center; gap: 4px; }
+.nav-links a:not(.nav-cta) { color: var(--text2); text-decoration: none; font-size: 0.8rem; font-weight: 500; padding: 7px 14px; border-radius: 8px; transition: all 0.2s; }
+.nav-links a:not(.nav-cta):hover { color: var(--text); background: rgba(255,255,255,0.03); }
+.nav-cta { display: inline-flex; align-items: center; padding: 9px 20px; background: var(--accent); color: var(--bg) !important; border-radius: 8px; font-weight: 700; font-size: 0.8rem; text-decoration: transition: all 0.3s var(--ease); margin-left: 8px; }
+.nav-cta:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,255,136,0.25); }
+.mobile-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.3rem; cursor: pointer; }
 
 /* ── Hero ── */
 .hero { position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden; }
-#three-container { position: absolute; inset: 0; z-index: 0; }
-#three-container canvas { display: block; }
-.hero-gradient-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(135deg, rgba(2,2,4,0.85) 0%, rgba(2,2,4,0.4) 40%, rgba(2,2,4,0.3) 60%, rgba(2,2,4,0.9) 100%); pointer-events: none; }
-.hero-content { position: relative; z-index: 2; max-width: 1320px; margin: 0 auto; width: 100%; padding: 120px 48px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
-.hero-left { }
-.hero-badge { display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px; background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.15); border-radius: 100px; font-size: 0.7rem; font-weight: 700; color: var(--accent); font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 32px; backdrop-filter: blur(12px); }
-.hero-badge .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: pulse 2s ease-in-out infinite; }
+#three-hero { position: absolute; inset: 0; z-index: 0; }
+.hero-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(160deg, rgba(1,1,3,0.92) 0%, rgba(1,1,3,0.5) 35%, rgba(1,1,3,0.3) 55%, rgba(1,1,3,0.8) 100%); pointer-events: none; }
+.hero-content { position: relative; z-index: 2; max-width: 1380px; margin: 0 auto; width: 100%; padding: 100px 48px 80px; }
+.hero-inner { max-width: 720px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 10px; padding: 7px 16px; background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.1); border-radius: 100px; font-size: 0.68rem; font-weight: 700; color: var(--accent); font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 36px; backdrop-filter: blur(10px); }
+.hero-badge .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 2s ease-in-out infinite; }
 @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
-.hero h1 { font-size: clamp(48px, 6vw, 88px); font-weight: 900; line-height: 1.02; letter-spacing: -0.055em; margin-bottom: 28px; }
-.hero h1 .line { display: block; overflow: hidden; }
-.hero h1 .line-inner { display: block; transform: translateY(110%); animation: slideUp 1s var(--ease) forwards; }
-.hero h1 .line:nth-child(2) .line-inner { animation-delay: 0.15s; }
-.hero h1 .line:nth-child(3) .line-inner { animation-delay: 0.3s; }
-@keyframes slideUp { to { transform: translateY(0); } }
-.hero h1 .accent { background: linear-gradient(135deg, var(--accent) 0%, var(--cyan) 50%, var(--blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.hero-desc { font-size: 1.12rem; color: var(--text2); line-height: 1.8; max-width: 480px; margin-bottom: 40px; opacity: 0; animation: fadeIn 1s 0.6s var(--ease) forwards; }
-@keyframes fadeIn { to { opacity: 1; } }
-.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 56px; opacity: 0; animation: fadeIn 1s 0.75s var(--ease) forwards; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 32px; border: 1px solid transparent; border-radius: 12px; font-size: 1rem; font-weight: 700; font-family: inherit; line-height: 1.2; cursor: pointer; transition: all 0.3s var(--ease); text-decoration: none; position: relative; overflow: hidden; }
-.btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent); opacity: 0; transition: opacity 0.3s; }
-.btn:hover::before { opacity: 1; }
+.hero h1 { font-size: clamp(52px, 6.5vw, 96px); font-weight: 900; line-height: 1.01; letter-spacing: -0.055em; margin-bottom: 32px; }
+.hero h1 .line { display: block; }
+.hero h1 .accent { background: linear-gradient(135deg, var(--accent) 0%, var(--cyan) 60%, var(--blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-desc { font-size: 1.12rem; color: var(--text2); line-height: 1.8; max-width: 520px; margin-bottom: 44px; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 56px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 30px; border: 1px solid transparent; border-radius: 10px; font-size: 0.95rem; font-weight: 700; font-family: inherit; line-height: 1.2; cursor: pointer; transition: all 0.3s var(--ease); text-decoration: none; }
 .btn-primary { background: var(--accent); color: var(--bg); }
-.btn-primary:hover { background: var(--accent2); transform: translateY(-3px); box-shadow: 0 16px 50px rgba(0,255,136,0.3); }
-.btn-secondary { background: rgba(255,255,255,0.04); color: var(--text); border-color: var(--border); backdrop-filter: blur(10px); }
-.btn-secondary:hover { border-color: var(--border2); background: rgba(255,255,255,0.08); transform: translateY(-3px); }
-.hero-proof { display: flex; align-items: center; gap: 36px; opacity: 0; animation: fadeIn 1s 0.9s var(--ease) forwards; }
-.hero-stat-num { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; color: var(--text); line-height: 1; }
-.hero-stat-num span { color: var(--accent); }
-.hero-stat-label { font-size: 0.72rem; color: var(--text3); margin-top: 6px; font-weight: 500; letter-spacing: 0.02em; }
-.hero-stat-divider { width: 1px; height: 36px; background: var(--border); }
+.btn-primary:hover { background: var(--accent2); transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,255,136,0.25); }
+.btn-secondary { background: rgba(255,255,255,0.03); color: var(--text); border-color: var(--border); }
+.btn-secondary:hover { border-color: var(--border2); background: rgba(255,255,255,0.06); transform: translateY(-3px); }
+.hero-stats { display: flex; align-items: center; gap: 32px; }
+.hs-num { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; color: var(--text); line-height: 1; }
+.hs-num em { color: var(--accent); font-style: normal; }
+.hs-label { font-size: 0.68rem; color: var(--text3); margin-top: 5px; font-weight: 500; letter-spacing: 0.02em; }
+.hs-divider { width: 1px; height: 32px; background: var(--border); }
 
-/* ── Marquee ── */
-.marquee-wrap { overflow: hidden; padding: 20px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.005); }
-.marquee { display: flex; gap: 56px; animation: marquee 40s linear infinite; width: max-content; }
-.marquee-item { font-family: var(--mono); font-size: 0.75rem; color: var(--text3); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 12px; }
-.marquee-item .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.4; }
+/* ── Social Proof Bar ── */
+.social-proof { padding: 48px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.003); overflow: hidden; }
+.sp-label { text-align: center; font-family: var(--mono); font-size: 0.65rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 28px; font-weight: 600; }
+.sp-marquee { display: flex; gap: 48px; animation: marquee 45s linear infinite; width: max-content; }
+.sp-item { font-family: var(--mono); font-size: 0.72rem; color: var(--text3); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 10px; }
+.sp-item .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); opacity: 0.3; }
 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-/* ── Sections ── */
+/* ── Section Base ── */
 .sec { padding: 140px 48px; position: relative; }
 .sec-inner { max-width: 1160px; margin: 0 auto; }
-.sec-eyebrow { display: inline-flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 20px; }
-.sec-eyebrow::before { content: ''; width: 28px; height: 1px; background: var(--accent); opacity: 0.5; }
-.sec-title { font-size: clamp(36px, 4.5vw, 62px); font-weight: 900; line-height: 1.06; letter-spacing: -0.045em; margin-bottom: 24px; }
-.sec-desc { font-size: 1.1rem; color: var(--text2); max-width: 560px; line-height: 1.8; }
+.eyebrow { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 0.65rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 20px; }
+.eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--accent); opacity: 0.4; }
+.sec-title { font-size: clamp(36px, 4.5vw, 64px); font-weight: 900; line-height: 1.05; letter-spacing: -0.045em; margin-bottom: 24px; }
+.sec-desc { font-size: 1.08rem; color: var(--text2); max-width: 540px; line-height: 1.8; }
 
-/* ── How it works ── */
+/* ── How It Works ── */
 #how { background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); }
-.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 72px; }
-.step-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 48px 36px; transition: all 0.5s var(--ease); position: relative; overflow: hidden; cursor: default; }
-.step-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--cyan), transparent); transform: scaleX(0); transform-origin: left; transition: transform 0.5s var(--ease); }
-.step-card:hover { transform: translateY(-10px); border-color: rgba(0,255,136,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.5); }
-.step-card:hover::after { transform: scaleX(1); }
-.step-num { font-family: var(--mono); font-size: 0.65rem; color: var(--accent); margin-bottom: 28px; letter-spacing: 0.12em; font-weight: 600; }
-.step-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 28px; background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.08); transition: all 0.4s; }
-.step-card:hover .step-icon { background: rgba(0,255,136,0.1); transform: scale(1.05); }
-.step-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 14px; letter-spacing: -0.02em; }
-.step-card p { font-size: 0.9rem; color: var(--text2); line-height: 1.7; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 72px; }
+.step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 48px 36px; transition: all 0.5s var(--ease); position: relative; overflow: hidden; }
+.step::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); transform: scaleX(0); transform-origin: left; transition: transform 0.5s var(--ease); }
+.step:hover { transform: translateY(-8px); border-color: rgba(0,255,136,0.12); box-shadow: 0 32px 80px rgba(0,0,0,0.4); }
+.step:hover::after { transform: scaleX(1); }
+.step-num { font-family: var(--mono); font-size: 0.62rem; color: var(--accent); margin-bottom: 28px; letter-spacing: 0.12em; font-weight: 600; }
+.step-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 24px; background: rgba(0,255,136,0.04); border: 1px solid rgba(0,255,136,0.06); }
+.step h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em; }
+.step p { font-size: 0.88rem; color: var(--text2); line-height: 1.65; }
 
 /* ── Services ── */
-#services { }
-.services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; margin-top: 72px; }
-.service-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0; transition: all 0.5s var(--ease); position: relative; overflow: hidden; display: flex; flex-direction: column; }
-.service-card:hover { transform: translateY(-10px); border-color: rgba(0,255,136,0.15); box-shadow: 0 40px 100px rgba(0,0,0,0.5); }
-.service-card.featured { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
-.sc-image { width: 100%; height: 220px; object-fit: cover; opacity: 0.7; transition: all 0.5s; }
-.service-card:hover .sc-image { opacity: 0.9; transform: scale(1.03); }
-.sc-image-wrap { overflow: hidden; position: relative; }
-.sc-image-wrap::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: linear-gradient(to top, var(--bg2), transparent); pointer-events: none; }
-.sc-body { padding: 36px 40px 40px; }
-.service-card.featured .sc-body { padding: 48px; display: flex; flex-direction: column; justify-content: center; }
-.sc-glow { position: absolute; top: -80px; right: -80px; width: 250px; height: 250px; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,136,0.05), transparent 70%); pointer-events: none; }
-.sc-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.08); }
-.service-card h3 { font-size: 1.35rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em; }
-.service-card p { font-size: 0.92rem; color: var(--text2); line-height: 1.7; margin-bottom: 20px; }
-.sc-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-.sc-tags span { padding: 4px 12px; background: rgba(0,255,136,0.04); border: 1px solid rgba(0,255,136,0.07); border-radius: 100px; font-size: 0.68rem; color: var(--accent); font-family: var(--mono); font-weight: 500; }
-.sc-price { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; color: var(--text); }
-.sc-price .from { font-size: 0.72rem; color: var(--text3); font-weight: 400; display: block; margin-bottom: 2px; }
-.sc-price .period { font-size: 0.78rem; color: var(--text3); font-weight: 400; }
+.svc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; margin-top: 72px; }
+.svc-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all 0.5s var(--ease); }
+.svc-card:hover { transform: translateY(-8px); border-color: rgba(0,255,136,0.12); box-shadow: 0 32px 80px rgba(0,0,0,0.4); }
+.svc-card.featured { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
+.svc-img-wrap { overflow: hidden; position: relative; height: 200px; }
+.svc-card.featured .svc-img-wrap { height: 100%; min-height: 320px; }
+.svc-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: all 0.5s; }
+.svc-card:hover .svc-img { opacity: 0.85; transform: scale(1.04); }
+.svc-img-wrap::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to top, var(--bg2), transparent); pointer-events: none; }
+.svc-body { padding: 36px 40px 40px; }
+.svc-card.featured .svc-body { padding: 48px; display: flex; flex-direction: column; justify-content: center; }
+.svc-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 20px; background: rgba(0,255,136,0.04); border: 1px solid rgba(0,255,136,0.06); }
+.svc-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em; }
+.svc-card p { font-size: 0.9rem; color: var(--text2); line-height: 1.7; margin-bottom: 20px; }
+.svc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
+.svc-tags span { padding: 4px 12px; background: rgba(0,255,136,0.03); border: 1px solid rgba(0,255,136,0.06); border-radius: 100px; font-size: 0.65rem; color: var(--accent); font-family: var(--mono); font-weight: 500; }
+.svc-price { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; }
+.svc-price .from { font-size: 0.68rem; color: var(--text3); font-weight: 400; display: block; margin-bottom: 2px; }
+.svc-price .period { font-size: 0.72rem; color: var(--text3); font-weight: 400; }
 .agent-feed { display: flex; flex-direction: column; gap: 8px; padding: 48px; }
-.agent-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; font-family: var(--mono); font-size: 0.75rem; transition: all 0.3s; }
-.agent-row:hover { background: rgba(255,255,255,0.04); border-color: var(--border2); transform: translateX(4px); }
-.ar-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; animation: pulse 2s infinite; }
-.ar-name { color: var(--text); font-weight: 600; }
-.ar-task { color: var(--text3); margin-left: auto; font-size: 0.68rem; }
+.arow { display: flex; align-items: center; gap: 10px; padding: 9px 14px; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 8px; font-family: var(--mono); font-size: 0.72rem; transition: all 0.3s; }
+.arow:hover { background: rgba(255,255,255,0.03); transform: translateX(4px); }
+.arow .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; animation: pulse 2s infinite; }
+.arow .name { color: var(--text); font-weight: 600; }
+.arow .task { color: var(--text3); margin-left: auto; font-size: 0.65rem; }
 
 /* ── Case Study ── */
-#case-study { background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%); }
-.casestudy { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 64px; margin-top: 72px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; position: relative; overflow: hidden; }
-.casestudy::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple), var(--accent)); background-size: 200% 100%; animation: gradientShift 4s linear infinite; }
-@keyframes gradientShift { 0% { background-position: 0% 0%; } 100% { background-position: 200% 0%; } }
-.cs-tag { font-family: var(--mono); font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 16px; font-weight: 600; }
-.casestudy h3 { font-size: 2rem; font-weight: 800; margin-bottom: 18px; line-height: 1.15; letter-spacing: -0.03em; }
-.casestudy p { color: var(--text2); line-height: 1.8; margin-bottom: 32px; font-size: 1rem; }
-.cs-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-.cs-num { font-family: var(--mono); font-size: 2.2rem; font-weight: 700; line-height: 1; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.cs-label { font-size: 0.72rem; color: var(--text3); margin-top: 6px; }
-.cs-feed { display: flex; flex-direction: column; gap: 8px; }
-.cs-row { display: flex; align-items: center; gap: 10px; padding: 9px 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; font-family: var(--mono); font-size: 0.72rem; transition: all 0.3s; }
-.cs-row:hover { background: rgba(255,255,255,0.04); transform: translateX(4px); }
-.cs-row .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+#case { background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%); }
+.cs-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 60px; margin-top: 72px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; overflow: hidden; }
+.cs-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple), var(--accent)); background-size: 200% 100%; animation: shift 4s linear infinite; }
+@keyframes shift { 0% { background-position: 0% 0%; } 100% { background-position: 200% 0%; } }
+.cs-tag { font-family: var(--mono); font-size: 0.62rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 16px; font-weight: 600; }
+.cs-card h3 { font-size: 1.9rem; font-weight: 800; margin-bottom: 16px; line-height: 1.15; letter-spacing: -0.03em; }
+.cs-card p { color: var(--text2); line-height: 1.8; margin-bottom: 28px; font-size: 0.95rem; }
+.cs-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.cs-num { font-family: var(--mono); font-size: 2rem; font-weight: 700; line-height: 1; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.cs-label { font-size: 0.68rem; color: var(--text3); margin-top: 5px; }
+.cs-feed { display: flex; flex-direction: column; gap: 6px; }
+.cs-row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 0.68rem; transition: all 0.3s; }
+.cs-row:hover { background: rgba(255,255,255,0.03); transform: translateX(3px); }
+.cs-row .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 .cs-row .name { color: var(--text); font-weight: 600; }
-.cs-row .task { color: var(--text3); margin-left: auto; font-size: 0.65rem; }
+.cs-row .task { color: var(--text3); margin-left: auto; font-size: 0.62rem; }
 
 /* ── Pricing ── */
 #pricing { background: var(--bg2); }
-.pricing-intro { text-align: center; margin-bottom: 72px; }
-.pricing-intro .sec-desc { margin: 0 auto; }
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-.pricing-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px 28px; text-align: left; transition: all 0.5s var(--ease); position: relative; display: flex; flex-direction: column; }
-.pricing-card:hover { transform: translateY(-10px); border-color: var(--border2); box-shadow: 0 40px 100px rgba(0,0,0,0.5); }
-.pricing-card.popular { border-color: rgba(0,255,136,0.25); background: linear-gradient(180deg, rgba(0,255,136,0.04) 0%, rgba(0,255,136,0.01) 40%, transparent 100%); }
-.pricing-card.popular::before { content: 'Most Popular'; position: absolute; top: -13px; left: 50%; transform: translateX(-50%); padding: 5px 16px; background: var(--accent); color: var(--bg); font-size: 0.65rem; font-weight: 800; border-radius: 100px; font-family: var(--mono); letter-spacing: 0.04em; white-space: nowrap; }
-.pc-tier { font-family: var(--mono); font-size: 0.68rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 16px; font-weight: 600; }
-.pc-price { font-family: var(--mono); font-size: 2.8rem; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.03em; }
-.pc-price .currency { font-size: 1.2rem; vertical-align: super; }
-.pc-price .period { font-size: 0.78rem; color: var(--text3); font-weight: 400; }
-.pc-desc { font-size: 0.82rem; color: var(--text2); margin-bottom: 28px; min-height: 36px; line-height: 1.5; }
-.pc-features { list-style: none; margin-bottom: 32px; flex: 1; }
-.pc-features li { padding: 9px 0; font-size: 0.82rem; color: var(--text2); border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; align-items: center; gap: 10px; }
-.pc-features li:last-child { border-bottom: none; }
-.pc-features li .check { color: var(--accent); font-family: var(--mono); flex-shrink: 0; font-size: 0.75rem; }
-.pc-features li.muted { color: var(--text3); }
-.pricing-card .btn { width: 100%; }
+.pricing-header { text-align: center; margin-bottom: 72px; }
+.pricing-header .sec-desc { margin: 0 auto; }
+.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.pc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 36px 28px; transition: all 0.5s var(--ease); position: relative; display: flex; flex-direction: column; }
+.pc:hover { transform: translateY(-8px); border-color: var(--border2); box-shadow: 0 32px 80px rgba(0,0,0,0.4); }
+.pc.popular { border-color: rgba(0,255,136,0.2); background: linear-gradient(180deg, rgba(0,255,136,0.03) 0%, transparent 50%); }
+.pc.popular::before { content: 'Most Popular'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 4px 14px; background: var(--accent); color: var(--bg); font-size: 0.62rem; font-weight: 800; border-radius: 100px; font-family: var(--mono); white-space: nowrap; }
+.pc-tier { font-family: var(--mono); font-size: 0.62rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 14px; font-weight: 600; }
+.pc-price { font-family: var(--mono); font-size: 2.6rem; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.03em; }
+.pc-price .cur { font-size: 1.1rem; vertical-align: super; }
+.pc-price .per { font-size: 0.72rem; color: var(--text3); font-weight: 400; }
+.pc-desc { font-size: 0.78rem; color: var(--text2); margin-bottom: 24px; min-height: 34px; line-height: 1.5; }
+.pc-feats { list-style: none; margin-bottom: 28px; flex: 1; }
+.pc-feats li { padding: 8px 0; font-size: 0.78rem; color: var(--text2); border-bottom: 1px solid rgba(255,255,255,0.02); display: flex; align-items: center; gap: 8px; }
+.pc-feats li:last-child { border-bottom: none; }
+.pc-feats li .ck { color: var(--accent); font-family: var(--mono); font-size: 0.7rem; flex-shrink: 0; }
+.pc-feats li.muted { color: var(--text3); }
+.pc .btn { width: 100%; }
 
 /* ── FAQ ── */
-.faq-list { margin-top: 72px; max-width: 740px; }
+.faq-list { margin-top: 72px; max-width: 720px; }
 .faq-item { border-bottom: 1px solid var(--border); }
-.faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 28px 0; background: none; border: none; color: var(--text); font-family: inherit; font-size: 1.05rem; font-weight: 700; cursor: pointer; text-align: left; transition: color 0.25s; letter-spacing: -0.01em; }
+.faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 26px 0; background: none; border: none; color: var(--text); font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; text-align: left; transition: color 0.2s; }
 .faq-q:hover { color: var(--accent); }
-.faq-arrow { font-size: 1rem; color: var(--text3); transition: all 0.35s; flex-shrink: 0; margin-left: 20px; }
+.faq-arrow { font-size: 0.9rem; color: var(--text3); transition: all 0.3s; flex-shrink: 0; margin-left: 16px; }
 .faq-item.open .faq-arrow { transform: rotate(180deg); color: var(--accent); }
-.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.45s var(--ease); }
-.faq-a-inner { padding: 0 0 28px; color: var(--text2); font-size: 0.95rem; line-height: 1.8; }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.4s var(--ease); }
+.faq-a-inner { padding: 0 0 26px; color: var(--text2); font-size: 0.92rem; line-height: 1.75; }
 
 /* ── CTA ── */
 #cta { text-align: center; background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); }
-#cta .sec-desc { margin: 0 auto 48px; }
-.cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
-.cta-trust { font-size: 0.78rem; color: var(--text3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+#cta .sec-desc { margin: 0 auto 44px; }
+.cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 44px; }
+.cta-trust { font-size: 0.75rem; color: var(--text3); }
 
 /* ── Footer ── */
-.footer { padding: 44px 48px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px; font-size: 0.8rem; color: var(--text3); }
-.footer-links { display: flex; gap: 28px; flex-wrap: wrap; }
+.footer { padding: 40px 48px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; font-size: 0.78rem; color: var(--text3); }
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
 .footer-links a { color: var(--text3); text-decoration: none; transition: color 0.2s; }
 .footer-links a:hover { color: var(--text); }
 
 /* ── Reveal ── */
-.reveal { opacity: 0; transform: translateY(40px); transition: all 1s var(--ease); }
+.reveal { opacity: 0; transform: translateY(40px); transition: all 0.9s var(--ease); }
 .reveal.visible { opacity: 1; transform: translateY(0); }
-.reveal-delay-1 { transition-delay: 0.12s; }
-.reveal-delay-2 { transition-delay: 0.24s; }
-.reveal-delay-3 { transition-delay: 0.36s; }
+.d1 { transition-delay: 0.1s; }
+.d2 { transition-delay: 0.2s; }
+.d3 { transition-delay: 0.3s; }
 
 /* ── Responsive ── */
-@media (max-width: 1100px) {
+@media(max-width:1100px) {
   .pricing-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 1024px) {
-  .hero-content { grid-template-columns: 1fr; }
-  #three-container { position: absolute; width: 100%; height: 50%; bottom: 0; top: auto; }
-  .hero-gradient-overlay { background: linear-gradient(to top, rgba(2,2,4,0.95) 0%, rgba(2,2,4,0.6) 50%, rgba(2,2,4,0.3) 100%); }
-  .steps-grid { grid-template-columns: 1fr; }
-  .services-grid { grid-template-columns: 1fr; }
-  .service-card.featured { grid-template-columns: 1fr; }
-  .casestudy { grid-template-columns: 1fr; padding: 44px; }
+@media(max-width:1024px) {
+  .hero h1 { font-size: clamp(40px, 7vw, 64px); }
+  .steps { grid-template-columns: 1fr; }
+  .svc-grid { grid-template-columns: 1fr; }
+  .svc-card.featured { grid-template-columns: 1fr; }
+  .cs-card { grid-template-columns: 1fr; padding: 40px; }
   .pricing-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 768px) {
+@media(max-width:768px) {
   .nav { padding: 0 20px; }
   .nav-links { display: none; }
   .mobile-toggle { display: block; }
   .hero-content { padding: 100px 24px 60px; }
   .sec { padding: 80px 24px; }
-  .hero-proof { flex-wrap: wrap; gap: 20px; }
-  .hero-stat-divider { display: none; }
-  .pricing-grid { grid-template-columns: 1fr; max-width: 380px; margin-left: auto; margin-right: auto; }
+  .hero-stats { flex-wrap: wrap; gap: 20px; }
+  .hs-divider { display: none; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; }
   .cs-stats { grid-template-columns: 1fr; }
   .footer { flex-direction: column; text-align: center; }
 }
@@ -244,87 +232,83 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
   <div class="nav-links">
     <a href="#how">How it works</a>
     <a href="#services">Services</a>
-    <a href="#case-study">Case Study</a>
+    <a href="#case">Case Study</a>
     <a href="#pricing">Pricing</a>
     <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="nav-cta">Get Started →</a>
   </div>
-  <button class="mobile-toggle" onclick="var nl=document.querySelector('.nav-links'); nl.style.display=nl.style.display==='flex'?'none':'flex'; nl.style.flexDirection='column'; nl.style.position='absolute'; nl.style.top='72px'; nl.style.left='0'; nl.style.right='0'; nl.style.background='rgba(2,2,4,0.95)'; nl.style.padding='20px'; nl.style.borderBottom='1px solid var(--border)'">☰</button>
+  <button class="mobile-toggle" onclick="var n=document.querySelector('.nav-links');n.style.display=n.style.display==='flex'?'none':'flex';n.style.cssText='flex-direction:column;position:absolute;top:68px;left:0;right:0;background:rgba(1,1,3,0.95);padding:16px;border-bottom:1px solid var(--border)'">☰</button>
 </nav>
 
 <!-- Hero -->
 <section class="hero">
-  <div id="three-container"></div>
-  <div class="hero-gradient-overlay"></div>
+  <div id="three-hero"></div>
+  <div class="hero-overlay"></div>
   <div class="hero-content">
-    <div class="hero-left">
-      <div class="hero-badge"><div class="pulse"></div> Live — 29 AI Agents Running 24/7</div>
+    <div class="hero-inner">
+      <div class="hero-badge"><div class="pulse"></div> Live — 29 AI Agents Running</div>
       <h1>
-        <span class="line"><span class="line-inner">Describe what</span></span>
-        <span class="line"><span class="line-inner">you need. <span class="accent">Our agents</span></span></span>
-        <span class="line"><span class="line-inner"><span class="accent">build it.</span></span></span>
+        <span class="line">Describe what you need.</span>
+        <span class="line"><span class="accent">Our agents build it.</span></span>
       </h1>
-      <p class="hero-desc">AI agents that automate your business workflows, run 24/7, and scale on demand. From $49/mo. No code required.</p>
+      <p class="hero-desc">AI agents that automate your business 24/7. From scraping to reporting, from lead gen to deployment. No code. No complexity. Just results.</p>
       <div class="hero-actions">
         <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-primary">Start Automating →</a>
-        <a href="#case-study" class="btn btn-secondary">See How It Works</a>
+        <a href="#case" class="btn btn-secondary">See It In Action</a>
       </div>
-      <div class="hero-proof">
-        <div><div class="hero-stat-num">29</div><div class="hero-stat-label">Active AI Agents</div></div>
-        <div class="hero-stat-divider"></div>
-        <div><div class="hero-stat-num">1,600<span>+</span></div><div class="hero-stat-label">Tasks Completed</div></div>
-        <div class="hero-stat-divider"></div>
-        <div><div class="hero-stat-num">99.7<span>%</span></div><div class="hero-stat-label">Uptime</div></div>
+      <div class="hero-stats">
+        <div><div class="hs-num">29</div><div class="hs-label">Active Agents</div></div>
+        <div class="hs-divider"></div>
+        <div><div class="hs-num">1,600<em>+</em></div><div class="hs-label">Tasks Done</div></div>
+        <div class="hs-divider"></div>
+        <div><div class="hs-num">99.7<em>%</em></div><div class="hs-label">Uptime</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Marquee -->
-<div class="marquee-wrap">
-  <div class="marquee">
-    <div class="marquee-item"><div class="dot"></div> Workflow Automation</div>
-    <div class="marquee-item"><div class="dot"></div> Data Pipelines</div>
-    <div class="marquee-item"><div class="dot"></div> Lead Generation</div>
-    <div class="marquee-item"><div class="dot"></div> Report Generation</div>
-    <div class="marquee-item"><div class="dot"></div> Customer Support</div>
-    <div class="marquee-item"><div class="dot"></div> API Integration</div>
-    <div class="marquee-item"><div class="dot"></div> Web Scraping</div>
-    <div class="marquee-item"><div class="dot"></div> Content Creation</div>
-    <div class="marquee-item"><div class="dot"></div> Trading Automation</div>
-    <div class="marquee-item"><div class="dot"></div> Monitoring & Alerts</div>
-    <div class="marquee-item"><div class="dot"></div> Workflow Automation</div>
-    <div class="marquee-item"><div class="dot"></div> Data Pipelines</div>
-    <div class="marquee-item"><div class="dot"></div> Lead Generation</div>
-    <div class="marquee-item"><div class="dot"></div> Report Generation</div>
-    <div class="marquee-item"><div class="dot"></div> Customer Support</div>
-    <div class="marquee-item"><div class="dot"></div> API Integration</div>
+<!-- Social Proof -->
+<div class="social-proof">
+  <div class="sp-label">Trusted by teams who automate at scale</div>
+  <div class="sp-marquee">
+    <div class="sp-item"><div class="dot"></div> 29 autonomous agents</div>
+    <div class="sp-item"><div class="dot"></div> 1,600+ tasks completed</div>
+    <div class="sp-item"><div class="dot"></div> 99.7% uptime</div>
+    <div class="sp-item"><div class="dot"></div> 48h delivery</div>
+    <div class="sp-item"><div class="dot"></div> From $49/mo</div>
+    <div class="sp-item"><div class="dot"></div> No code required</div>
+    <div class="sp-item"><div class="dot"></div"> 29 autonomous agents</div>
+    <div class="sp-item"><div class="dot"></div> 1,600+ tasks completed</div>
+    <div class="sp-item"><div class="dot"></div> 99.7% uptime</div>
+    <div class="sp-item"><div class="dot"></div> 48h delivery</div>
+    <div class="sp-item"><div class="dot"></div> From $49/mo</div>
+    <div class="sp-item"><div class="dot"></div> No code required</div>
   </div>
 </div>
 
-<!-- How it works -->
+<!-- How It Works -->
 <section class="sec" id="how">
   <div class="sec-inner">
-    <div class="sec-eyebrow">Process</div>
-    <h2 class="sec-title">Three steps to<br>full automation.</h2>
-    <p class="sec-desc">No complex setup. No learning curve. Describe what you need and our agents handle the rest.</p>
-    <div class="steps-grid">
-      <div class="step-card reveal">
+    <div class="eyebrow">How it works</div>
+    <h2 class="sec-title">Three steps.<br>Zero friction.</h2>
+    <p class="sec-desc">No complex setup. No learning curve. You describe, we build, agents run.</p>
+    <div class="steps">
+      <div class="step reveal">
         <div class="step-num">01</div>
         <div class="step-icon">💬</div>
         <h3>Tell us what you need</h3>
-        <p>Describe your workflow, pain point, or business goal in plain English. Our agents analyze and design the optimal solution.</p>
+        <p>Describe your workflow, pain point, or business goal in plain English. Our agents analyze and design the solution.</p>
       </div>
-      <div class="step-card reveal reveal-delay-1">
+      <div class="step reveal d1">
         <div class="step-num">02</div>
         <div class="step-icon">⚡</div>
         <h3>Agents build & deploy</h3>
-        <p>Our AI agents write the code, configure integrations, and deploy everything. Most projects are live within 48 hours.</p>
+        <p>Our AI agents write the code, configure integrations, and deploy. Most projects live within 48 hours.</p>
       </div>
-      <div class="step-card reveal reveal-delay-2">
+      <div class="step reveal d2">
         <div class="step-num">03</div>
         <div class="step-icon">🔄</div>
         <h3>Run & scale 24/7</h3>
-        <p>Your agents operate autonomously, monitoring, adapting, and scaling. You focus on strategy, they handle execution.</p>
+        <p>Your agents operate autonomously — monitoring, adapting, scaling. You focus on strategy, they handle execution.</p>
       </div>
     </div>
   </div>
@@ -333,54 +317,51 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
 <!-- Services -->
 <section class="sec" id="services">
   <div class="sec-inner">
-    <div class="sec-eyebrow">Services</div>
+    <div class="eyebrow">Services</div>
     <h2 class="sec-title">Automation that<br>drives revenue.</h2>
-    <p class="sec-desc">From single workflows to full autonomous agent teams — we build what your business actually needs.</p>
-    <div class="services-grid">
-      <div class="service-card featured reveal">
-        <div class="sc-image-wrap">
-          <img class="sc-image" src="assets/hero-bg.png" alt="AI Agent Core" loading="lazy">
+    <p class="sec-desc">From single workflows to full autonomous agent teams.</p>
+    <div class="svc-grid">
+      <div class="svc-card featured reveal">
+        <div class="svc-img-wrap">
+          <img class="svc-img" src="assets/hero-neural.png" alt="AI Neural Network" loading="lazy">
         </div>
-        <div class="sc-body">
-          <div class="sc-glow"></div>
-          <div class="sc-icon">🤖</div>
+        <div class="svc-body">
+          <div class="svc-icon">🤖</div>
           <h3>Dedicated AI Agents</h3>
-          <p>Custom autonomous agents that run your specific business processes 24/7. Each agent is purpose-built, monitored, and continuously optimized.</p>
-          <div class="sc-tags"><span>24/7 Operation</span><span>Custom Training</span><span>SLA Guaranteed</span><span>Auto-scaling</span><span>Real-time Monitoring</span></div>
-          <div class="sc-price"><span class="from">from</span> $2,000<span class="period">/mo per agent</span></div>
+          <p>Custom autonomous agents that run your specific business processes 24/7. Purpose-built, monitored, continuously optimized.</p>
+          <div class="svc-tags"><span>24/7 Operation</span><span>Custom Training</span><span>SLA</span><span>Auto-scaling</span><span>Monitoring</span></div>
+          <div class="svc-price"><span class="from">from</span> $2,000<span class="period">/mo per agent</span></div>
         </div>
         <div class="agent-feed">
-          <div class="agent-row"><div class="ar-dot" style="background:var(--accent)"></div><span class="ar-name">sales-agent</span><span class="ar-task">47 leads → 12 qualified</span></div>
-          <div class="agent-row"><div class="ar-dot" style="background:var(--blue)"></div><span class="ar-name">data-pipeline</span><span class="ar-task">2.4M rows processed</span></div>
-          <div class="agent-row"><div class="ar-dot" style="background:var(--orange)"></div><span class="ar-name">support-agent</span><span class="ar-task">94% resolution rate</span></div>
-          <div class="agent-row"><div class="ar-dot" style="background:var(--purple)"></div><span class="ar-name">report-agent</span><span class="ar-task">12 reports/day</span></div>
-          <div class="agent-row"><div class="ar-dot" style="background:var(--cyan)"></div><span class="ar-name">monitor-agent</span><span class="ar-task">99.7% uptime</span></div>
+          <div class="arow"><div class="dot" style="background:var(--accent)"></div><span class="name">sales-agent</span><span class="task">47 leads → 12 qualified</span></div>
+          <div class="arow"><div class="dot" style="background:var(--blue)"></div><span class="name">data-pipeline</span><span class="task">2.4M rows processed</span></div>
+          <div class="arow"><div class="dot" style="background:var(--orange)"></div><span class="name">support-agent</span><span class="task">94% resolution</span></div>
+          <div class="arow"><div class="dot" style="background:var(--purple)"></div><span class="name">report-agent</span><span class="task">12 reports/day</span></div>
+          <div class="arow"><div class="dot" style="background:var(--cyan)"></div><span class="name">monitor-agent</span><span class="task">99.7% uptime</span></div>
         </div>
       </div>
-      <div class="service-card reveal">
-        <div class="sc-image-wrap">
-          <img class="sc-image" src="assets/workflow.png" alt="Workflow Automation" loading="lazy">
+      <div class="svc-card reveal">
+        <div class="svc-img-wrap">
+          <img class="svc-img" src="assets/workflow-v2.png" alt="Workflow" loading="lazy">
         </div>
-        <div class="sc-body">
-          <div class="sc-glow"></div>
-          <div class="sc-icon">⚙️</div>
+        <div class="svc-body">
+          <div class="svc-icon">⚙️</div>
           <h3>Workflow Automation</h3>
-          <p>Connect your tools, automate repetitive tasks, and eliminate manual work. We build end-to-end pipelines that just work.</p>
-          <div class="sc-tags"><span>API Integration</span><span>Data Processing</span><span>Scheduled Tasks</span><span>Error Handling</span></div>
-          <div class="sc-price"><span class="from">from</span> $199<span class="period">/mo</span></div>
+          <p>Connect your tools, automate repetitive tasks, eliminate manual work. End-to-end pipelines that just work.</p>
+          <div class="svc-tags"><span>API Integration</span><span>Data Processing</span><span>Scheduling</span><span>Error Handling</span></div>
+          <div class="svc-price"><span class="from">from</span> $199<span class="period">/mo</span></div>
         </div>
       </div>
-      <div class="service-card reveal">
-        <div class="sc-image-wrap">
-          <img class="sc-image" src="assets/data-dashboard.png" alt="Data Dashboard" loading="lazy">
+      <div class="svc-card reveal">
+        <div class="svc-img-wrap">
+          <img class="svc-img" src="assets/hologram-dashboard.png" alt="Dashboard" loading="lazy">
         </div>
-        <div class="sc-body">
-          <div class="sc-glow"></div>
-          <div class="sc-icon">📊</div>
+        <div class="svc-body">
+          <div class="svc-icon">📊</div>
           <h3>Data & Reporting</h3>
-          <p>Automated data collection, processing, and report generation. Get insights delivered on schedule, not on demand.</p>
-          <div class="sc-tags"><span>Web Scraping</span><span>Data Cleaning</span><span>Dashboards</span><span>Scheduled Reports</span></div>
-          <div class="sc-price"><span class="from">from</span> $299<span class="period">/mo</span></div>
+          <p>Automated data collection, processing, and report generation. Insights delivered on schedule, not on demand.</p>
+          <div class="svc-tags"><span>Web Scraping</span><span>Data Cleaning</span><span>Dashboards</span><span>Reports</span></div>
+          <div class="svc-price"><span class="from">from</span> $299<span class="period">/mo</span></div>
         </div>
       </div>
     </div>
@@ -388,12 +369,12 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
 </section>
 
 <!-- Case Study -->
-<section class="sec" id="case-study">
+<section class="sec" id="case">
   <div class="sec-inner">
-    <div class="sec-eyebrow">Case Study</div>
+    <div class="eyebrow">Case Study</div>
     <h2 class="sec-title">We eat our own cooking.</h2>
-    <p class="sec-desc">ZOO runs on the same agent infrastructure we sell. 29 autonomous agents. 1,600+ tasks. 24/7 operation. Zero human intervention.</p>
-    <div class="casestudy reveal">
+    <p class="sec-desc">ZOO runs on the same agent infrastructure we sell. 29 autonomous agents. 1,600+ tasks. 24/7. Zero human intervention.</p>
+    <div class="cs-card reveal">
       <div>
         <div class="cs-tag">// Internal Case Study</div>
         <h3>How ZOO runs itself with 29 AI agents</h3>
@@ -410,8 +391,8 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
         <div class="cs-row"><div class="dot" style="background:var(--orange)"></div><span class="name">Content Creator</span><span class="task">39 pieces created</span></div>
         <div class="cs-row"><div class="dot" style="background:var(--purple)"></div><span class="name">Growth Agent</span><span class="task">230+ emails sent</span></div>
         <div class="cs-row"><div class="dot" style="background:var(--cyan)"></div><span class="name">DevOps Engineer</span><span class="task">9/9 sites online</span></div>
-        <div class="cs-row"><div class="dot" style="background:var(--orange)"></div><span class="name">Trading Agent</span><span class="task">Live market analysis</span></div>
-        <div class="cs-row"><div class="dot" style="background:#ef4444"></div><span class="name">Partnership Agent</span><span class="task">44 partners contacted</span></div>
+        <div class="cs-row"><div class="dot" style="background:var(--pink)"></div><span class="name">Trading Agent</span><span class="task">Live market analysis</span></div>
+        <div class="cs-row"><div class="dot" style="background:var(--yellow)"></div><span class="name">Partnership Agent</span><span class="task">44 partners contacted</span></div>
       </div>
     </div>
   </div>
@@ -420,63 +401,63 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
 <!-- Pricing -->
 <section class="sec" id="pricing">
   <div class="sec-inner">
-    <div class="pricing-intro">
-      <div class="sec-eyebrow">Pricing</div>
+    <div class="pricing-header">
+      <div class="eyebrow">Pricing</div>
       <h2 class="sec-title">Start from $49/mo.</h2>
       <p class="sec-desc">No hidden fees. No surprises. Scale when you're ready.</p>
     </div>
     <div class="pricing-grid">
-      <div class="pricing-card reveal">
+      <div class="pc reveal">
         <div class="pc-tier">Starter</div>
-        <div class="pc-price"><span class="currency">$</span>49<span class="period">/mo</span></div>
-        <div class="pc-desc">Perfect for solopreneurs getting started with automation.</div>
-        <ul class="pc-features">
-          <li><span class="check">→</span> 1 automated workflow</li>
-          <li><span class="check">→</span> 72h delivery</li>
-          <li><span class="check">→</span> Email support</li>
-          <li><span class="check">→</span> Error monitoring</li>
-          <li class="muted"><span class="check" style="opacity:0.3">→</span> SLA guarantee</li>
+        <div class="pc-price"><span class="cur">$</span>49<span class="per">/mo</span></div>
+        <div class="pc-desc">For solopreneurs getting started.</div>
+        <ul class="pc-feats">
+          <li><span class="ck">→</span> 1 workflow</li>
+          <li><span class="ck">→</span> 72h delivery</li>
+          <li><span class="ck">→</span> Email support</li>
+          <li><span class="ck">→</span> Monitoring</li>
+          <li class="muted"><span class="ck" style="opacity:0.3">→</span> SLA</li>
         </ul>
         <a href="https://buy.stripe.com/9B64gy9aGfFucgy2NMgA80p" class="btn btn-secondary">Get Started</a>
       </div>
-      <div class="pricing-card popular reveal reveal-delay-1">
+      <div class="pc popular reveal d1">
         <div class="pc-tier">Pro</div>
-        <div class="pc-price"><span class="currency">$</span>199<span class="period">/mo</span></div>
-        <div class="pc-desc">For growing businesses that need reliable automation.</div>
-        <ul class="pc-features">
-          <li><span class="check">→</span> 3 automated workflows</li>
-          <li><span class="check">→</span> 48h delivery</li>
-          <li><span class="check">→</span> Priority support</li>
-          <li><span class="check">→</span> Weekly reporting</li>
-          <li><span class="check">→</span> Error monitoring & recovery</li>
+        <div class="pc-price"><span class="cur">$</span>199<span class="per">/mo</span></div>
+        <div class="pc-desc">Growing businesses. Reliable automation.</div>
+        <ul class="pc-feats">
+          <li><span class="ck">→</span> 3 workflows</li>
+          <li><span class="ck">→</span> 48h delivery</li>
+          <li><span class="ck">→</span> Priority support</li>
+          <li><span class="ck">→</span> Weekly reports</li>
+          <li><span class="ck">→</span> Error recovery</li>
         </ul>
         <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-primary">Get Started</a>
       </div>
-      <div class="pricing-card reveal reveal-delay-2">
+      <div class="pc reveal d2">
         <div class="pc-tier">Growth</div>
-        <div class="pc-price"><span class="currency">$</span>2,000<span class="period">/mo</span></div>
-        <div class="pc-desc">Dedicated AI agent. 24/7 autonomous operation.</div>
-        <ul class="pc-features">
-          <li><span class="check">→</span> 1 dedicated AI agent</li>
-          <li><span class="check">→</span> 24/7 operation</li>
-          <li><span class="check">→</span> 24h delivery</li>
-          <li><span class="check">→</span> SLA guarantee</li>
-          <li><span class="check">→</span> Real-time monitoring</li>
-          <li><span class="check">→</span> Auto-scaling</li>
+        <div class="pc-price"><span class="cur">$</span>2K<span class="per">/mo</span></div>
+        <div class="pc-desc">Dedicated AI agent. 24/7 operation.</div>
+        <ul class="pc-feats">
+          <li><span class="ck">→</span> 1 dedicated agent</li>
+          <li><span class="ck">→</span> 24/7 operation</li>
+          <li><span class="ck">→</span> 24h delivery</li>
+          <li><span class="ck">→</span> SLA guarantee</li>
+          <li><span class="ck">→</span> Real-time monitoring</li>
+          <li><span class="ck">→</span> Auto-scaling</li>
         </ul>
         <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-secondary">Get Started</a>
       </div>
-      <div class="pricing-card reveal reveal-delay-3">
+      <div class="pc reveal d3">
         <div class="pc-tier">Enterprise</div>
-        <div class="pc-price" style="font-size:1.5rem; padding-top:14px; padding-bottom:14px">Custom</div>
-        <div class="pc-desc">Full agent team. Custom integrations, on-premise option.</div>
-        <ul class="pc-features">
-          <li><span class="check">→</span> Multiple dedicated agents</li>
-          <li><span class="check">→</span> Custom integrations</li>
-          <li><span class="check">→</span> Dedicated account manager</li>
-          <li><span class="check">→</span> Custom SLA</li>
-          <li><span class="check">→</span> On-premise option</li>
-          <li><span class="check">→</span> White-label available</li>
+        <div class="pc-price" style="font-size:1.4rem;padding-top:12px;padding-bottom:12px">Custom</div>
+        <div class="pc-desc">Full agent team. Custom everything.</div>
+        <ul class="pc-feats">
+          <li><span class="ck">→</span> Multiple agents</li>
+          <li><span class="ck">→</span> Custom integrations</li>
+          <li><span class="ck">→</span> Account manager</li>
+          <li><span class="ck">→</span> Custom SLA</li>
+          <li><span class="ck">→</span> On-premise</li>
+          <li><span class="ck">→</span> White-label</li>
         </ul>
         <a href="https://buy.stripe.com/4gMaEWaeKfFudkC1JIgA80r" class="btn btn-secondary">Contact Us</a>
       </div>
@@ -487,28 +468,24 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
 <!-- FAQ -->
 <section class="sec" id="faq">
   <div class="sec-inner">
-    <div class="sec-eyebrow">FAQ</div>
+    <div class="eyebrow">FAQ</div>
     <h2 class="sec-title">Common questions.</h2>
     <div class="faq-list">
       <div class="faq-item">
         <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">How quickly can you deploy?<span class="faq-arrow">↓</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Starter and Pro workflows are live within 48-72 hours. Dedicated agents (Growth tier) take 3-5 days. Enterprise deployments are scoped individually.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Starter/Pro: 48-72h. Dedicated agents: 3-5 days. Enterprise: scoped individually.</div></div>
       </div>
       <div class="faq-item">
         <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">What tasks can be automated?<span class="faq-arrow">↓</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Anything repetitive and rule-based: data entry, report generation, lead qualification, email outreach, web scraping, API integrations, monitoring, content generation, and much more.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Do I need technical knowledge?<span class="faq-arrow">↓</span></button>
-        <div class="faq-a"><div class="faq-a-inner">No. You describe what you need in plain English. Our agents handle all the technical implementation, deployment, and maintenance.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Anything repetitive: data entry, reports, lead gen, email outreach, scraping, API integrations, monitoring, content, and more.</div></div>
       </div>
       <div class="faq-item">
         <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">How is this different from Zapier?<span class="faq-arrow">↓</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Zapier connects apps with if-then rules. Our agents understand context, make decisions, and handle complexity no workflow tool can. We don't just move data — we think, adapt, and execute autonomously.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Zapier connects apps with if-then rules. Our agents understand context, make decisions, and handle complexity no workflow tool can. We don't just move data — we think and execute.</div></div>
       </div>
       <div class="faq-item">
-        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I start small and scale?<span class="faq-arrow">↓</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Absolutely. Start at $49/mo, prove the value, then upgrade. No lock-in, adjust anytime.</div></div>
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I start small?<span class="faq-arrow">↓</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Start at $49/mo, prove value, then upgrade. No lock-in, adjust anytime.</div></div>
       </div>
     </div>
   </div>
@@ -517,14 +494,14 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
 <!-- CTA -->
 <section class="sec" id="cta">
   <div class="sec-inner">
-    <div class="sec-eyebrow">Get Started</div>
+    <div class="eyebrow">Get Started</div>
     <h2 class="sec-title">Ready to automate<br>your business?</h2>
-    <p class="sec-desc">Tell us what you need. We'll build it, deploy it, and run it — so you don't have to.</p>
+    <p class="sec-desc">Tell us what you need. We'll build it, deploy it, and run it.</p>
     <div class="cta-actions">
       <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-primary">Start Automating →</a>
-      <a href="mailto:hello@zootechnologies.com?subject=ZOO - Schedule a Demo" class="btn btn-secondary">Schedule a Demo</a>
+      <a href="mailto:hello@zootechnologies.com?subject=ZOO - Demo" class="btn btn-secondary">Schedule Demo</a>
     </div>
-    <div class="cta-trust">✓ No credit card required &nbsp; ✓ Cancel anytime &nbsp; ✓ 48h delivery</div>
+    <div class="cta-trust">✓ No credit card to start &nbsp; ✓ Cancel anytime &nbsp; ✓ 48h delivery</div>
   </div>
 </section>
 
@@ -540,159 +517,155 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
 </footer>
 
 <script>
-// ── Cursor glow ──
+// Cursor
 var gx=0,gy=0,tx=0,ty=0;
 var cg=document.getElementById('cg');
 document.addEventListener('mousemove',function(e){tx=e.clientX;ty=e.clientY;});
-(function loop(){
-  gx+=(tx-gx)*0.05;gy+=(ty-gy)*0.05;
-  if(cg){cg.style.left=gx+'px';cg.style.top=gy+'px';}
-  requestAnimationFrame(loop);
-})();
+(function loop(){gx+=(tx-gx)*0.05;gy+=(ty-gy)*.05;if(cg){cg.style.left=gx+'px';cg.style.top=gy+'px';}requestAnimationFrame(loop);})();
 
-// ── Reveal on scroll ──
-var observer=new IntersectionObserver(function(entries){
-  entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});
-},{threshold:0.06,rootMargin:'0px 0px -60px 0px'});
-document.querySelectorAll('.reveal').forEach(function(el){observer.observe(el);});
+// Reveal
+var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.06,rootMargin:'0px 0px -60px 0px'});
+document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
 
-// ── Nav scroll ──
-window.addEventListener('scroll',function(){
-  var nav=document.getElementById('nav');
-  if(window.scrollY>60) nav.classList.add('scrolled');
-  else nav.classList.remove('scrolled');
-});
+// Nav
+window.addEventListener('scroll',function(){var n=document.getElementById('nav');if(window.scrollY>60)n.classList.add('scrolled');else n.classList.remove('scrolled');});
 
-// ── Three.js 3D Model ──
+// ── Three.js: 3D Agent Dashboard Console ──
 (function(){
-  var container=document.getElementById('three-container');
-  if(!container) return;
-  
+  var c=document.getElementById('three-hero');
+  if(!c)return;
   var scene=new THREE.Scene();
-  var camera=new THREE.PerspectiveCamera(45, container.offsetWidth/container.offsetHeight, 0.1, 100);
-  camera.position.set(0,1.5,5);
-  camera.lookAt(0,0,0);
-  
-  var renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-  renderer.setSize(container.offsetWidth,container.offsetHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-  renderer.setClearColor(0x000000,0);
-  renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.2;
-  container.appendChild(renderer.domElement);
-  
+  var cam=new THREE.PerspectiveCamera(50,c.offsetWidth/c.offsetHeight,0.1,100);
+  cam.position.set(0,2,6);cam.lookAt(0,0,0);
+  var ren=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  ren.setSize(c.offsetWidth,c.offsetHeight);ren.setPixelRatio(Math.min(devicePixelRatio,2));
+  ren.setClearColor(0x000000,0);ren.toneMapping=THREE.ACESFilmicToneMapping;ren.toneMappingExposure=1.1;
+  c.appendChild(ren.domElement);
+
   // Lights
-  var ambientLight=new THREE.AmbientLight(0x404060,0.6);
-  scene.add(ambientLight);
-  var dirLight=new THREE.DirectionalLight(0x00ff88,1.2);
-  dirLight.position.set(3,4,2);
-  scene.add(dirLight);
-  var dirLight2=new THREE.DirectionalLight(0x4f8fff,0.6);
-  dirLight2.position.set(-3,2,-2);
-  scene.add(dirLight2);
-  var pointLight=new THREE.PointLight(0x00ff88,0.8,15);
-  pointLight.position.set(0,2,3);
-  scene.add(pointLight);
-  
-  // Load GLB model
-  var model=null;
-  var loader=new THREE.GLTFLoader();
-  var modelLoaded=false;
-  
-  loader.load('models/mech-drone.glb',function(gltf){
-    model=gltf.scene;
-    model.scale.set(0.8,0.8,0.8);
-    model.position.set(0.8,0,0);
-    model.rotation.y=-0.3;
-    
-    model.traverse(function(child){
-      if(child.isMesh){
-        child.material.envMapIntensity=1.5;
-        if(child.material.metalness!==undefined){
-          child.material.metalness=Math.max(child.material.metalness,0.3);
-          child.material.roughness=Math.min(child.material.roughness,0.7);
-        }
-      }
-    });
-    scene.add(model);
-    modelLoaded=true;
-  },undefined,function(e){
-    console.warn('Model load error, using fallback');
-  });
-  
-  // Fallback: geometric shape if model doesn't load
-  var fallbackGroup=new THREE.Group();
-  var coreGeo=new THREE.IcosahedronGeometry(0.8,1);
-  var coreMat=new THREE.MeshStandardMaterial({color:0x00ff88,metalness:0.8,roughness:0.2,emissive:0x00ff88,emissiveIntensity:0.3,wireframe:false});
-  var core=new THREE.Mesh(coreGeo,coreMat);
-  fallbackGroup.add(core);
-  
-  var ringGeo=new THREE.TorusGeometry(1.2,0.02,16,100);
-  var ringMat=new THREE.MeshStandardMaterial({color:0x4f8fff,emissive:0x4f8fff,emissiveIntensity:0.5});
-  var ring1=new THREE.Mesh(ringGeo,ringMat);
-  ring1.rotation.x=Math.PI/2.5;
-  fallbackGroup.add(ring1);
-  var ring2=new THREE.Mesh(ringGeo.clone(),ringMat.clone());
-  ring2.rotation.x=-Math.PI/3;
-  ring2.rotation.z=Math.PI/4;
-  fallbackGroup.add(ring2);
-  
-  // Particles around fallback
-  var pGeo=new THREE.BufferGeometry();
-  var pCount=200;
-  var pPos=new Float32Array(pCount*3);
-  for(var i=0;i<pCount*3;i++) pPos[i]=(Math.random()-0.5)*8;
-  pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
-  var pMat=new THREE.PointsMaterial({color:0x00ff88,size:0.03,transparent:true,opacity:0.6});
-  var particles=new THREE.Points(pGeo,pMat);
-  fallbackGroup.add(particles);
-  
-  fallbackGroup.position.set(0.8,0,0);
-  scene.add(fallbackGroup);
-  
-  // Mouse interaction
-  var mouseX=0,mouseY=0;
-  document.addEventListener('mousemove',function(e){
-    mouseX=(e.clientX/window.innerWidth-0.5)*2;
-    mouseY=(e.clientY/window.innerHeight-0.5)*2;
-  });
-  
-  // Animation
-  var time=0;
-  function animate(){
-    requestAnimationFrame(animate);
-    time+=0.008;
-    
-    if(model&&modelLoaded){
-      model.rotation.y=-0.3+Math.sin(time*0.5)*0.15+mouseX*0.1;
-      model.position.y=Math.sin(time)*0.1;
+  scene.add(new THREE.AmbientLight(0x303050,0.5));
+  var dl1=new THREE.DirectionalLight(0x00ff88,1);dl1.position.set(3,4,2);scene.add(dl1);
+  var dl2=new THREE.DirectionalLight(0x4f8fff,0.5);dl2.position.set(-3,2,-2);scene.add(dl2);
+  var pl=new THREE.PointLight(0x00ff88,0.6,12);pl.position.set(0,2,3);scene.add(pl);
+
+  // ── Build a 3D Kanban Dashboard ──
+  var dash=new THREE.Group();
+
+  // Main console base — a floating dark panel
+  var baseGeo=new THREE.BoxGeometry(5,0.08,3);
+  var baseMat=new THREE.MeshStandardMaterial({color:0x0a0a12,metalness:0.9,roughness:0.3});
+  var base=new THREE.Mesh(baseGeo,baseMat);base.position.y=-0.8;dash.add(base);
+
+  // Glowing edge lines on the base
+  var edgeGeo=new THREE.EdgesGeometry(baseGeo);
+  var edgeMat=new THREE.LineBasicMaterial({color:0x00ff88,transparent:true,opacity:0.4});
+  var edges=new THREE.LineSegments(edgeGeo,edgeMat);edges.position.y=-0.8;dash.add(edges);
+
+  // Column dividers (kanban columns)
+  var colMat=new THREE.MeshStandardMaterial({color:0x111122,metalness:0.7,roughness:0.4,transparent:true,opacity:0.6});
+  for(var i=-1;i<=1;i+=2){
+    var div=new THREE.Mesh(new THREE.BoxGeometry(0.02,1.8,2.8),colMat);
+    div.position.set(i*1.6,0.2,0);dash.add(div);
+  }
+
+  // Column headers — glowing bars
+  var hdrMat=new THREE.MeshStandardMaterial({color:0x00ff88,emissive:0x00ff88,emissiveIntensity:0.5,transparent:true,opacity:0.15});
+  var colors=[0x00ff88,0x4f8fff,0xa855f7];
+  var colNames=['BACKLOG','BUILDING','DEPLOYED'];
+  for(var i=-1;i<=1;i+=2){
+    for(var j=0;j<3;j++){
+      var hdr=new THREE.Mesh(new THREE.BoxGeometry(1.4,0.06,0.06),new THREE.MeshStandardMaterial({color:colors[j],emissive:colors[j],emissiveIntensity:0.8,transparent:true,opacity:0.6}));
+      hdr.position.set(i*1.6,1.15,-1.2+j*1.2);dash.add(hdr);
     }
-    
-    // Always animate fallback (it's behind or as backup)
-    core.rotation.y=time*0.3;
-    core.rotation.x=Math.sin(time*0.5)*0.2;
-    ring1.rotation.z=time*0.2;
-    ring2.rotation.y=time*0.15;
-    particles.rotation.y=time*0.02;
-    particles.rotation.x=time*0.01;
-    
-    // Subtle camera movement
-    camera.position.x=mouseX*0.5;
-    camera.position.y=1.5+mouseY*0.3;
-    camera.lookAt(0.5,0,0);
-    
-    pointLight.position.x=Math.sin(time)*3;
-    pointLight.position.z=Math.cos(time)*3;
-    
-    renderer.render(scene,camera);
+  }
+
+  // Agent cards — small floating boxes in each column
+  var cardGeo=new THREE.BoxGeometry(1.1,0.18,0.8);
+  var agentData=[
+    {col:-1,color:0x00ff88,names:['scraper','monitor','parser']},
+    {col:0,color:0x4f8fff,names:['builder','tester','deployer']},
+    {col:1,color:0xa855f7,names:['sales','support','report']}
+  ];
+  var allCards=[];
+  agentData.forEach(function(col){
+    for(var i=0;i<3;i++){
+      var mat=new THREE.MeshStandardMaterial({color:col.color,metalness:0.6,roughness:0.3,emissive:col.color,emissiveIntensity:0.15,transparent:true,opacity:0.85});
+      var card=new THREE.Mesh(cardGeo,mat);
+      card.position.set(col.col*1.6,0.1+i*0.55,-1.2+i*1.2);
+      card.userData={baseY:card.position.y,speed:0.5+Math.random()*0.5,phase:Math.random()*Math.PI*2};
+      dash.add(card);
+      allCards.push(card);
+
+      // Small status dot on each card
+      var dot=new THREE.Mesh(new THREE.SphereGeometry(0.04,8,8),new THREE.MeshStandardMaterial({color:col.color,emissive:col.color,emissiveIntensity:1}));
+      dot.position.set(col.col*1.6+0.45,0.1+i*0.55+0.1,-1.2+i*1.2+0.3);
+      dash.add(dot);
+    }
+  });
+
+  // Floating particles around the dashboard
+  var pGeo=new THREE.BufferGeometry();
+  var pCount=120;
+  var pPos=new Float32Array(pCount*3);
+  for(var i=0;i<pCount*3;i++)pPos[i]=(Math.random()-0.5)*10;
+  pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
+  var pMat=new THREE.PointsMaterial({color:0x00ff88,size:0.025,transparent:true,opacity:0.4});
+  var particles=new THREE.Points(pGeo,pMat);
+  dash.add(particles);
+
+  // Orbiting ring around the dashboard
+  var ringGeo=new THREE.TorusGeometry(3.2,0.015,16,100);
+  var ringMat=new THREE.MeshStandardMaterial({color:0x00ff88,emissive:0x00ff88,emissiveIntensity:0.4,transparent:true,opacity:0.3});
+  var ring=new THREE.Mesh(ringGeo,ringMat);ring.rotation.x=Math.PI/2.5;dash.add(ring);
+  var ring2=new THREE.Mesh(new THREE.TorusGeometry(3.6,0.01,16,100),new THREE.MeshStandardMaterial({color:0x4f8fff,emissive:0x4f8fff,emissiveIntensity:0.3,transparent:true,opacity:0.2}));
+  ring2.rotation.x=-Math.PI/3;ring2.rotation.z=Math.PI/4;dash.add(ring2);
+
+  dash.position.set(1.5,-0.3,-1);
+  dash.rotation.y=-0.4;
+  scene.add(dash);
+
+  // Mouse
+  var mx=0,my=0;
+  document.addEventListener('mousemove',function(e){mx=(e.clientX/window.innerWidth-0.5)*2;my=(e.clientY/window.innerHeight-0.5)*2;});
+
+  // Animate
+  var t=0;
+  function animate(){
+    requestAnimationFrame(animate);t+=0.008;
+
+    // Dashboard gentle float
+    dash.position.y=-0.3+Math.sin(t)*0.08;
+    dash.rotation.y=-0.4+Math.sin(t*0.3)*0.05+mx*0.08;
+
+    // Cards bob independently
+    allCards.forEach(function(card){
+      card.position.y=card.userData.baseY+Math.sin(t*card.userData.speed+card.userData.phase)*0.04;
+    });
+
+    // Rings rotate
+    ring.rotation.z=t*0.15;
+    ring2.rotation.z=-t*0.1;
+
+    // Particles drift
+    particles.rotation.y=t*0.02;
+    particles.rotation.x=t*0.01;
+
+    // Light orbit
+    pl.position.x=Math.sin(t)*3;
+    pl.position.z=Math.cos(t)*3;
+
+    // Camera subtle
+    cam.position.x=mx*0.6;
+    cam.position.y=2+my*0.3;
+    cam.lookAt(0.5,0,0);
+
+    ren.render(scene,cam);
   }
   animate();
-  
-  // Resize
+
   window.addEventListener('resize',function(){
-    camera.aspect=container.offsetWidth/container.offsetHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container.offsetWidth,container.offsetHeight);
+    cam.aspect=c.offsetWidth/c.offsetHeight;cam.updateProjectionMatrix();
+    ren.setSize(c.offsetWidth,c.offsetHeight);
   });
 })();
 </script>
