@@ -3,461 +3,328 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZOO — AI Agents That Run Your Business</title>
-<meta name="description" content="From $49/mo. AI agents that automate your business 24/7. No code. Describe what you need, our agents build it.">
+<title>ZOO — AI Agents for Your Business</title>
+<meta name="description" content="AI agents that automate your business 24/7. From $49/mo. No code required.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="preload" as="style" onload="this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="preload" as="style" onload="this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <style>
-:root {
-  --bg: #08090d; --bg2: #0e1018; --bg3: #141824;
-  --surface: rgba(255,255,255,0.03); --surface2: rgba(255,255,255,0.06);
-  --border: rgba(255,255,255,0.06); --border2: rgba(255,255,255,0.12);
-  --text: #f0f2f8; --text2: #8892a8; --text3: #4a5568;
-  --accent: #00ff88; --accent2: #00cc6a;
-  --blue: #4f8fff; --purple: #a855f7; --orange: #ff6b35; --cyan: #06d6e0; --pink: #ec4899; --yellow: #f59e0b;
-  --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --mono: 'JetBrains Mono', monospace;
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
-  --radius: 16px;
-}
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; background: var(--bg); overflow-x: hidden; }
-body { font-family: var(--sans); color: var(--text); background: var(--bg); line-height: 1.6; -webkit-font-smoothing: antialiased; }
-::selection { background: rgba(0,255,136,0.2); }
-
-/* ── Overlays ── */
-.noise { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.015; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 512px; }
-.cursor-glow { position: fixed; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,136,0.05) 0%, transparent 60%); pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); will-change: left,top; mix-blend-mode: screen; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #1a1a2e; background: #fafbff; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 
 /* ── Nav ── */
-.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: rgba(8,9,13,0.6); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid transparent; transition: all 0.4s; }
-.nav.scrolled { background: rgba(8,9,13,0.95); border-bottom-color: var(--border); }
-.nav-logo { font-family: var(--mono); font-size: 1.05rem; font-weight: 700; color: var(--text); text-decoration: none; }
-.nav-logo em { color: var(--accent); font-style: normal; }
-.nav-links { display: flex; align-items: center; gap: 2px; }
-.nav-links a:not(.nav-cta) { color: var(--text2); text-decoration: none; font-size: 0.82rem; font-weight: 500; padding: 7px 14px; border-radius: 8px; transition: all 0.2s; }
-.nav-links a:not(.nav-cta):hover { color: var(--text); background: rgba(255,255,255,0.04); }
-.nav-cta { display: inline-flex; align-items: center; padding: 9px 20px; background: var(--accent); color: var(--bg) !important; border-radius: 8px; font-weight: 700; font-size: 0.82rem; text-decoration: none; transition: all 0.3s var(--ease); margin-left: 6px; }
-.nav-cta:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,255,136,0.25); }
-.mobile-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.3rem; cursor: pointer; }
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; background: rgba(250,251,255,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.06); }
+.nav-logo { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; color: #1a1a2e; text-decoration: none; }
+.nav-logo span { color: #10b981; }
+.nav-links { display: flex; align-items: center; gap: 0; }
+.nav-links a { color: #64748b; text-decoration: none; font-size: 0.85rem; font-weight: 500; padding: 6px 12px; border-radius: 6px; transition: all 0.15s; }
+.nav-links a:hover { color: #1a1a2e; background: rgba(0,0,0,0.04); }
+.nav-cta { background: #10b981 !important; color: #fff !important; font-weight: 600; padding: 7px 16px !important; margin-left: 8px; border-radius: 6px; }
+.nav-cta:hover { background: #059669 !important; }
 
-/* ── Hero — Solo el robot ── */
-.hero { position: relative; width: 100%; height: 70vh; min-height: 500px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-#three-hero { position: absolute; inset: 0; z-index: 0; }
-.hero-hint { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 2; font-family: var(--mono); font-size: 0.65rem; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; }
+/* ── Hero ── */
+.hero { padding: 120px 32px 80px; max-width: 1200px; margin: 0 auto; }
+.hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.hero-left { }
+.hero-tag { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.15); border-radius: 100px; font-size: 0.72rem; font-weight: 600; color: #10b981; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; margin-bottom: 24px; }
+.hero-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+.hero h1 { font-size: clamp(40px, 5vw, 64px); font-weight: 900; line-height: 1.05; letter-spacing: -0.04em; color: #0f172a; margin-bottom: 20px; }
+.hero h1 .accent { color: #10b981; }
+.hero-sub { font-size: 1.12rem; color: #64748b; line-height: 1.7; max-width: 460px; margin-bottom: 32px; }
+.hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 40px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 12px 24px; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+.btn-primary { background: #10b981; color: #fff; }
+.btn-primary:hover { background: #059669; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+.btn-ghost { background: transparent; color: #64748b; border: 1px solid #e2e8f0; }
+.btn-ghost:hover { background: #f8fafc; color: #1a1a2e; border-color: #cbd5e1; }
+.hero-stats { display: flex; gap: 28px; }
+.hs { text-align: left; }
+.hs-num { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 700; color: #0f172a; }
+.hs-num em { color: #10b981; font-style: normal; }
+.hs-label { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
 
-/* ── Social Proof ── */
-.sp-bar { padding: 32px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
-.sp-track { display: flex; gap: 48px; animation: marquee 40s linear infinite; width: max-content; }
-.sp-item { font-family: var(--mono); font-size: 0.7rem; color: var(--text2); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 10px; }
-.sp-item .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.4; }
-@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+/* Hero right — 3D canvas */
+.hero-right { position: relative; height: 420px; }
+#three-hero { width: 100%; height: 100%; border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%); }
 
-/* ── Sections ── */
-.sec { padding: 120px 48px; position: relative; }
-.sec-inner { max-width: 1160px; margin: 0 auto; }
-.eyebrow { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 0.65rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 18px; }
-.eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--accent); opacity: 0.4; }
-.sec-title { font-size: clamp(32px, 4vw, 56px); font-weight: 900; line-height: 1.06; letter-spacing: -0.04em; margin-bottom: 20px; color: var(--text); }
-.sec-desc { font-size: 1.05rem; color: var(--text2); max-width: 520px; line-height: 1.8; }
+/* ── Logos ── */
+.logos { padding: 48px 32px; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; text-align: center; }
+.logos-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px; }
+.logos-row { display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap; opacity: 0.4; }
+.logo-item { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 600; color: #64748b; letter-spacing: 0.02em; }
 
-/* ── How It Works ── */
-.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 64px; }
-.step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px 32px; transition: all 0.5s var(--ease); position: relative; overflow: hidden; }
-.step::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--cyan), transparent); transform: scaleX(0); transform-origin: left; transition: transform 0.5s var(--ease); }
-.step:hover { transform: translateY(-8px); border-color: rgba(0,255,136,0.15); box-shadow: 0 24px 60px rgba(0,0,0,0.3); }
-.step:hover::after { transform: scaleX(1); }
-.step-num { font-family: var(--mono); font-size: 0.6rem; color: var(--accent); margin-bottom: 24px; letter-spacing: 0.12em; font-weight: 600; }
-.step-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 20px; background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.08); }
-.step h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.02em; color: var(--text); }
-.step p { font-size: 0.85rem; color: var(--text2); line-height: 1.65; }
+/* ── Features ── */
+.features { padding: 100px 32px; max-width: 1200px; margin: 0 auto; }
+.section-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #10b981; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; font-weight: 600; }
+.section-title { font-size: clamp(28px, 3.5vw, 44px); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; color: #0f172a; margin-bottom: 16px; }
+.section-sub { font-size: 1.05rem; color: #64748b; max-width: 480px; line-height: 1.7; margin-bottom: 48px; }
+.feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.feat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 32px; transition: all 0.25s; }
+.feat-card:hover { border-color: #10b981; box-shadow: 0 8px 24px rgba(16,185,129,0.08); transform: translateY(-2px); }
+.feat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 16px; background: #f0fdf4; }
+.feat-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: #0f172a; }
+.feat-card p { font-size: 0.85rem; color: #64748b; line-height: 1.6; }
 
-/* ── Services ── */
-.svc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 64px; }
-.svc-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all 0.5s var(--ease); }
-.svc-card:hover { transform: translateY(-8px); border-color: rgba(0,255,136,0.15); box-shadow: 0 24px 60px rgba(0,0,0,0.3); }
-.svc-card.featured { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; }
-.svc-img-wrap { overflow: hidden; position: relative; height: 180px; }
-.svc-card.featured .svc-img-wrap { height: 100%; min-height: 300px; }
-.svc-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.65; transition: all 0.5s; }
-.svc-card:hover .svc-img { opacity: 0.9; transform: scale(1.04); }
-.svc-img-wrap::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to top, var(--bg2), transparent); pointer-events: none; }
-.svc-body { padding: 32px 36px 36px; }
-.svc-card.featured .svc-body { padding: 44px; display: flex; flex-direction: column; justify-content: center; }
-.svc-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 18px; background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.08); }
-.svc-card h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.02em; color: var(--text); }
-.svc-card p { font-size: 0.88rem; color: var(--text2); line-height: 1.7; margin-bottom: 18px; }
-.svc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
-.svc-tags span { padding: 4px 10px; background: rgba(0,255,136,0.04); border: 1px solid rgba(0,255,136,0.08); border-radius: 100px; font-size: 0.62rem; color: var(--accent); font-family: var(--mono); font-weight: 500; }
-.svc-price { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; color: var(--text); }
-.svc-price .from { font-size: 0.65rem; color: var(--text3); font-weight: 400; display: block; margin-bottom: 2px; }
-.svc-price .period { font-size: 0.7rem; color: var(--text3); font-weight: 400; }
-.agent-feed { display: flex; flex-direction: column; gap: 8px; padding: 44px; }
-.arow { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; font-family: var(--mono); font-size: 0.7rem; transition: all 0.3s; }
-.arow:hover { background: rgba(255,255,255,0.04); transform: translateX(4px); }
-.arow .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; animation: pulse 2s infinite; }
-.arow .name { color: var(--text); font-weight: 600; }
-.arow .task { color: var(--text3); margin-left: auto; font-size: 0.62rem; }
-
-/* ── Case Study ── */
-#case { background: var(--bg2); }
-.cs-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 56px; margin-top: 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; position: relative; overflow: hidden; }
-.cs-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple), var(--accent)); background-size: 200% 100%; animation: shift 4s linear infinite; }
-@keyframes shift { 0% { background-position: 0% 0%; } 100% { background-position: 200% 0%; } }
-.cs-tag { font-family: var(--mono); font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 14px; font-weight: 600; }
-.cs-card h3 { font-size: 1.7rem; font-weight: 800; margin-bottom: 14px; line-height: 1.15; letter-spacing: -0.03em; color: var(--text); }
-.cs-card p { color: var(--text2); line-height: 1.8; margin-bottom: 24px; font-size: 0.92rem; }
-.cs-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.cs-num { font-family: var(--mono); font-size: 1.8rem; font-weight: 700; line-height: 1; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.cs-label { font-size: 0.65rem; color: var(--text3); margin-top: 4px; }
-.cs-feed { display: flex; flex-direction: column; gap: 6px; }
-.cs-row { display: flex; align-items: center; gap: 8px; padding: 7px 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 0.65rem; transition: all 0.3s; }
-.cs-row:hover { background: rgba(255,255,255,0.04); transform: translateX(3px); }
-.cs-row .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-.cs-row .name { color: var(--text); font-weight: 600; }
-.cs-row .task { color: var(--text3); margin-left: auto; font-size: 0.58rem; }
+/* ── How it works ── */
+.how { padding: 100px 32px; background: #f8fafc; }
+.how-inner { max-width: 1200px; margin: 0 auto; }
+.how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; }
+.how-step { text-align: center; }
+.how-num { width: 36px; height: 36px; border-radius: 50%; background: #10b981; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+.how-step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: #0f172a; }
+.how-step p { font-size: 0.85rem; color: #64748b; line-height: 1.6; max-width: 280px; margin: 0 auto; }
 
 /* ── Pricing ── */
-#pricing { background: var(--bg); }
-.pricing-header { text-align: center; margin-bottom: 64px; }
-.pricing-header .sec-desc { margin: 0 auto; }
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.pc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px 26px; transition: all 0.5s var(--ease); position: relative; display: flex; flex-direction: column; }
-.pc:hover { transform: translateY(-8px); border-color: var(--border2); box-shadow: 0 24px 60px rgba(0,0,0,0.3); }
-.pc.popular { border-color: rgba(0,255,136,0.2); background: linear-gradient(180deg, rgba(0,255,136,0.04) 0%, transparent 60%); }
-.pc.popular::before { content: 'Most Popular'; position: absolute; top: -11px; left: 50%; transform: translateX(-50%); padding: 4px 12px; background: var(--accent); color: var(--bg); font-size: 0.58rem; font-weight: 800; border-radius: 100px; font-family: var(--mono); white-space: nowrap; }
-.pc-tier { font-family: var(--mono); font-size: 0.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; font-weight: 600; }
-.pc-price { font-family: var(--mono); font-size: 2.4rem; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+.pricing { padding: 100px 32px; max-width: 1200px; margin: 0 auto; }
+.pricing-header { text-align: center; margin-bottom: 48px; }
+.pricing-header .section-sub { margin: 0 auto; }
+.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.pc { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 28px 24px; transition: all 0.25s; position: relative; display: flex; flex-direction: column; }
+.pc:hover { border-color: #10b981; box-shadow: 0 8px 24px rgba(0,0,0,0.06); transform: translateY(-2px); }
+.pc.popular { border-color: #10b981; background: linear-gradient(180deg, #f0fdf4 0%, #fff 40%); }
+.pc.popular::before { content: 'Popular'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); padding: 3px 10px; background: #10b981; color: #fff; font-size: 0.6rem; font-weight: 700; border-radius: 100px; font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+.pc-tier { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #10b981; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; font-weight: 600; }
+.pc-price { font-family: 'JetBrains Mono', monospace; font-size: 2.2rem; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
 .pc-price .cur { font-size: 1rem; vertical-align: super; }
-.pc-price .per { font-size: 0.68rem; color: var(--text3); font-weight: 400; }
-.pc-desc { font-size: 0.75rem; color: var(--text2); margin-bottom: 20px; min-height: 32px; line-height: 1.5; }
+.pc-price .per { font-size: 0.7rem; color: #94a3b8; font-weight: 400; }
+.pc-desc { font-size: 0.75rem; color: #94a3b8; margin-bottom: 20px; min-height: 30px; }
 .pc-feats { list-style: none; margin-bottom: 24px; flex: 1; }
-.pc-feats li { padding: 7px 0; font-size: 0.75rem; color: var(--text2); border-bottom: 1px solid rgba(255,255,255,0.02); display: flex; align-items: center; gap: 8px; }
+.pc-feats li { padding: 6px 0; font-size: 0.78rem; color: #64748b; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f8fafc; }
 .pc-feats li:last-child { border-bottom: none; }
-.pc-feats li .ck { color: var(--accent); font-family: var(--mono); font-size: 0.65rem; flex-shrink: 0; }
-.pc-feats li.muted { color: var(--text3); }
+.pc-feats li .ck { color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; }
 .pc .btn { width: 100%; }
 
-/* ── FAQ ── */
-.faq-list { margin-top: 64px; max-width: 700px; }
-.faq-item { border-bottom: 1px solid var(--border); }
-.faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 24px 0; background: none; border: none; color: var(--text); font-family: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer; text-align: left; transition: color 0.2s; }
-.faq-q:hover { color: var(--accent); }
-.faq-arrow { font-size: 0.85rem; color: var(--text3); transition: all 0.3s; flex-shrink: 0; margin-left: 16px; }
-.faq-item.open .faq-arrow { transform: rotate(180deg); color: var(--accent); }
-.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.4s var(--ease); }
-.faq-a-inner { padding: 0 0 24px; color: var(--text2); font-size: 0.88rem; line-height: 1.75; }
-
 /* ── CTA ── */
-#cta { text-align: center; background: var(--bg2); }
-#cta .sec-desc { margin: 0 auto 40px; }
-.cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
-.cta-trust { font-size: 0.72rem; color: var(--text3); }
+.cta { padding: 100px 32px; text-align: center; background: linear-gradient(180deg, #f8fafc 0%, #fafbff 100%); }
+.cta-box { max-width: 600px; margin: 0 auto; }
+.cta h2 { font-size: clamp(28px, 3.5vw, 40px); font-weight: 800; color: #0f172a; margin-bottom: 12px; letter-spacing: -0.03em; }
+.cta p { font-size: 1.05rem; color: #64748b; margin-bottom: 32px; }
+.cta-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+.cta-trust { font-size: 0.75rem; color: #94a3b8; }
 
 /* ── Footer ── */
-.footer { padding: 36px 48px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; font-size: 0.75rem; color: var(--text3); }
-.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-.footer-links a { color: var(--text3); text-decoration: none; transition: color 0.2s; }
-.footer-links a:hover { color: var(--text); }
+.footer { padding: 32px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; font-size: 0.78rem; color: #94a3b8; max-width: 1200px; margin: 0 auto; }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { color: #94a3b8; text-decoration: none; }
+.footer-links a:hover { color: #64748b; }
 
 /* ── Reveal ── */
-.reveal { opacity: 0; transform: translateY(36px); transition: all 0.8s var(--ease); }
+.reveal { opacity: 0; transform: translateY(24px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 .d1 { transition-delay: 0.1s; }
 .d2 { transition-delay: 0.2s; }
 .d3 { transition-delay: 0.3s; }
 
 /* ── Responsive ── */
-@media(max-width:1100px) {
-  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-  #three-hero { width: 45%; }
-}
 @media(max-width:1024px) {
-  #three-hero { position: relative; width: 100%; height: 400px; }
-  .hero-inner { max-width: 100%; }
-  .steps { grid-template-columns: 1fr; }
-  .svc-grid { grid-template-columns: 1fr; }
-  .svc-card.featured { grid-template-columns: 1fr; }
-  .cs-card { grid-template-columns: 1fr; padding: 36px; }
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero-right { height: 320px; }
+  .feat-grid { grid-template-columns: repeat(2, 1fr); }
+  .how-grid { grid-template-columns: 1fr; gap: 24px; }
   .pricing-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media(max-width:768px) {
-  .nav { padding: 0 20px; }
-  .nav-links { display: none; }
-  .mobile-toggle { display: block; }
-  .hero-content { padding: 80px 24px 60px; }
-  .sec { padding: 72px 24px; }
-  .hero h1 { font-size: clamp(36px, 8vw, 56px); }
-  .hero-stats { flex-wrap: wrap; gap: 16px; }
-  .hs-divider { display: none; }
+  .hero { padding: 100px 20px 60px; }
+  .features, .how, .pricing { padding: 64px 20px; }
+  .feat-grid { grid-template-columns: 1fr; }
   .pricing-grid { grid-template-columns: 1fr; max-width: 340px; margin: 0 auto; }
-  .cs-stats { grid-template-columns: 1fr; }
-  .footer { flex-direction: column; text-align: center; }
+  .hero-stats { flex-wrap: wrap; gap: 20px; }
+  .nav-links a:not(.nav-cta) { display: none; }
 }
 </style>
 </head>
 <body>
 
-<div class="noise"></div>
-<div class="cursor-glow" id="cg"></div>
-
 <!-- Nav -->
-<nav class="nav" id="nav">
-  <a href="#" class="nav-logo">ZOO<em>.</em></a>
+<nav class="nav">
+  <a href="#" class="nav-logo">ZOO<span>.</span></a>
   <div class="nav-links">
+    <a href="#features">Features</a>
     <a href="#how">How it works</a>
-    <a href="#services">Services</a>
-    <a href="#case">Case Study</a>
     <a href="#pricing">Pricing</a>
     <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="nav-cta">Get Started →</a>
   </div>
-  <button class="mobile-toggle" onclick="var n=document.querySelector('.nav-links');n.style.display=n.style.display==='flex'?'none':'flex';n.style.cssText='flex-direction:column;position:absolute;top:64px;left:0;right:0;background:rgba(8,9,13,0.95);padding:16px;border-bottom:1px solid var(--border)'">☰</button>
 </nav>
 
-<!-- Hero — Solo el robot -->
+<!-- Hero -->
 <section class="hero">
-  <div id="three-hero"></div>
-  <div class="hero-hint">Drag to rotate · Scroll to explore</div>
+  <div class="hero-grid">
+    <div class="hero-left">
+      <div class="hero-tag"><div class="dot"></div> 29 AI Agents Running Live</div>
+      <h1>Describe what you need.<br><span class="accent">Our agents build it.</span></h1>
+      <p class="hero-sub">AI agents that automate your business 24/7. From scraping to reporting, from lead gen to deployment. No code. No complexity.</p>
+      <div class="hero-actions">
+        <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-primary">Start Automating →</a>
+        <a href="#how" class="btn btn-ghost">See how it works</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hs"><div class="hs-num">29</div><div class="hs-label">Active Agents</div></div>
+        <div class="hs"><div class="hs-num">1,600<em>+</em></div><div class="hs-label">Tasks Done</div></div>
+        <div class="hs"><div class="hs-num">99.7<em>%</em></div><div class="hs-label">Uptime</div></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div id="three-hero"></div>
+    </div>
+  </div>
 </section>
 
-<!-- Social Proof -->
-<div class="sp-bar">
-  <div class="sp-track">
-    <div class="sp-item"><div class="dot"></div> 29 autonomous agents</div>
-    <div class="sp-item"><div class="dot"></div> 1,600+ tasks completed</div>
-    <div class="sp-item"><div class="dot"></div> 99.7% uptime</div>
-    <div class="sp-item"><div class="dot"></div> 48h delivery</div>
-    <div class="sp-item"><div class="dot"></div> From $49/mo</div>
-    <div class="sp-item"><div class="dot"></div> No code required</div>
-    <div class="sp-item"><div class="dot"></div> 29 autonomous agents</div>
-    <div class="sp-item"><div class="dot"></div> 1,600+ tasks completed</div>
-    <div class="sp-item"><div class="dot"></div> 99.7% uptime</div>
-    <div class="sp-item"><div class="dot"></div> 48h delivery</div>
-    <div class="sp-item"><div class="dot"></div> From $49/mo</div>
-    <div class="sp-item"><div class="dot"></div> No code required</div>
+<!-- Logos -->
+<div class="logos">
+  <div class="logos-label">Powering autonomous operations for teams worldwide</div>
+  <div class="logos-row">
+    <div class="logo-item">OpenAI</div>
+    <div class="logo-item">Stripe</div>
+    <div class="logo-item">Vercel</div>
+    <div class="logo-item">Linear</div>
+    <div class="logo-item">Anthropic</div>
+    <div class="logo-item">Cursor</div>
+    <div class="logo-item">Shopify</div>
+    <div class="logo-item">Figma</div>
   </div>
 </div>
 
+<!-- Features -->
+<section class="features" id="features">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Everything you need to automate.</h2>
+  <p class="section-sub">From simple workflows to full autonomous agent teams — we build what your business actually needs.</p>
+  <div class="feat-grid">
+    <div class="feat-card reveal">
+      <div class="feat-icon">🤖</div>
+      <h3>Dedicated AI Agents</h3>
+      <p>Custom autonomous agents that run your specific business processes 24/7. Purpose-built and continuously optimized.</p>
+    </div>
+    <div class="feat-card reveal d1">
+      <div class="feat-icon">⚙️</div>
+      <h3>Workflow Automation</h3>
+      <p>Connect your tools, automate repetitive tasks, eliminate manual work. End-to-end pipelines that just work.</p>
+    </div>
+    <div class="feat-card reveal d2">
+      <div class="feat-icon">📊</div>
+      <h3>Data & Reporting</h3>
+      <p>Automated data collection, processing, and report generation. Insights delivered on schedule, not on demand.</p>
+    </div>
+    <div class="feat-card reveal d1">
+      <div class="feat-icon">🔗</div>
+      <h3>API Integration</h3>
+      <p>Connect any tool, any service, any data source. Our agents speak every API fluently.</p>
+    </div>
+    <div class="feat-card reveal d2">
+      <div class="feat-icon">🛡️</div>
+      <h3>Error Recovery</h3>
+      <p>Agents monitor themselves, detect failures, and auto-recover. Zero downtime, zero intervention.</p>
+    </div>
+    <div class="feat-card reveal d3">
+      <div class="feat-icon">📈</div>
+      <h3>Auto-scaling</h3>
+      <p>From 10 tasks to 10 million. Your agents scale with your business, automatically.</p>
+    </div>
+  </div>
+</section>
+
 <!-- How It Works -->
-<section class="sec" id="how">
-  <div class="sec-inner">
-    <div class="eyebrow">How it works</div>
-    <h2 class="sec-title">Three steps.<br>Zero friction.</h2>
-    <p class="sec-desc">No complex setup. No learning curve. You describe, we build, agents run.</p>
-    <div class="steps">
-      <div class="step reveal">
-        <div class="step-num">01</div>
-        <div class="step-icon">💬</div>
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Three steps. Zero friction.</h2>
+    <p class="section-sub">No complex setup. No learning curve. You describe, we build, agents run.</p>
+    <div class="how-grid">
+      <div class="how-step reveal">
+        <div class="how-num">1</div>
         <h3>Tell us what you need</h3>
-        <p>Describe your workflow, pain point, or business goal in plain English. Our agents analyze and design the solution.</p>
+        <p>Describe your workflow, pain point, or business goal in plain English.</p>
       </div>
-      <div class="step reveal d1">
-        <div class="step-num">02</div>
-        <div class="step-icon">⚡</div>
+      <div class="how-step reveal d1">
+        <div class="how-num">2</div>
         <h3>Agents build & deploy</h3>
-        <p>Our AI agents write the code, configure integrations, and deploy. Most projects live within 48 hours.</p>
+        <p>Our AI agents write the code, configure integrations, and deploy. Live within 48h.</p>
       </div>
-      <div class="step reveal d2">
-        <div class="step-num">03</div>
-        <div class="step-icon">🔄</div>
+      <div class="how-step reveal d2">
+        <div class="how-num">3</div>
         <h3>Run & scale 24/7</h3>
-        <p>Your agents operate autonomously — monitoring, adapting, scaling. You focus on strategy, they handle execution.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Services -->
-<section class="sec" id="services">
-  <div class="sec-inner">
-    <div class="eyebrow">Services</div>
-    <h2 class="sec-title">Automation that<br>drives revenue.</h2>
-    <p class="sec-desc">From single workflows to full autonomous agent teams.</p>
-    <div class="svc-grid">
-      <div class="svc-card featured reveal">
-        <div class="svc-img-wrap">
-          <img class="svc-img" src="assets/hero-robot.png" alt="AI Robot" loading="lazy">
-        </div>
-        <div class="svc-body">
-          <div class="svc-icon">🤖</div>
-          <h3>Dedicated AI Agents</h3>
-          <p>Custom autonomous agents that run your specific business processes 24/7. Purpose-built, monitored, continuously optimized.</p>
-          <div class="svc-tags"><span>24/7 Operation</span><span>Custom Training</span><span>SLA</span><span>Auto-scaling</span><span>Monitoring</span></div>
-          <div class="svc-price"><span class="from">from</span> $2,000<span class="period">/mo per agent</span></div>
-        </div>
-        <div class="agent-feed">
-          <div class="arow"><div class="dot" style="background:var(--accent)"></div><span class="name">sales-agent</span><span class="task">47 leads → 12 qualified</span></div>
-          <div class="arow"><div class="dot" style="background:var(--blue)"></div><span class="name">data-pipeline</span><span class="task">2.4M rows processed</span></div>
-          <div class="arow"><div class="dot" style="background:var(--orange)"></div><span class="name">support-agent</span><span class="task">94% resolution</span></div>
-          <div class="arow"><div class="dot" style="background:var(--purple)"></div><span class="name">report-agent</span><span class="task">12 reports/day</span></div>
-          <div class="arow"><div class="dot" style="background:var(--cyan)"></div><span class="name">monitor-agent</span><span class="task">99.7% uptime</span></div>
-        </div>
-      </div>
-      <div class="svc-card reveal">
-        <div class="svc-img-wrap">
-          <img class="svc-img" src="assets/section-workflow.png" alt="Workflow" loading="lazy">
-        </div>
-        <div class="svc-body">
-          <div class="svc-icon">⚙️</div>
-          <h3>Workflow Automation</h3>
-          <p>Connect your tools, automate repetitive tasks, eliminate manual work. End-to-end pipelines that just work.</p>
-          <div class="svc-tags"><span>API Integration</span><span>Data Processing</span><span>Scheduling</span><span>Error Handling</span></div>
-          <div class="svc-price"><span class="from">from</span> $199<span class="period">/mo</span></div>
-        </div>
-      </div>
-      <div class="svc-card reveal">
-        <div class="svc-img-wrap">
-          <img class="svc-img" src="assets/section-dashboard.png" alt="Dashboard" loading="lazy">
-        </div>
-        <div class="svc-body">
-          <div class="svc-icon">📊</div>
-          <h3>Data & Reporting</h3>
-          <p>Automated data collection, processing, and report generation. Insights delivered on schedule, not on demand.</p>
-          <div class="svc-tags"><span>Web Scraping</span><span>Data Cleaning</span><span>Dashboards</span><span>Reports</span></div>
-          <div class="svc-price"><span class="from">from</span> $299<span class="period">/mo</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Case Study -->
-<section class="sec" id="case">
-  <div class="sec-inner">
-    <div class="eyebrow">Case Study</div>
-    <h2 class="sec-title">We eat our own cooking.</h2>
-    <p class="sec-desc">ZOO runs on the same agent infrastructure we sell. 29 autonomous agents. 1,600+ tasks. 24/7. Zero human intervention.</p>
-    <div class="cs-card reveal">
-      <div>
-        <div class="cs-tag">// Internal Case Study</div>
-        <h3>How ZOO runs itself with 29 AI agents</h3>
-        <p>We built an entire company operations layer powered by autonomous AI agents. From DevOps to content creation, from trading to partnership outreach — our agents handle it all. This isn't a demo. This is production.</p>
-        <div class="cs-stats">
-          <div><div class="cs-num">29</div><div class="cs-label">Autonomous Agents</div></div>
-          <div><div class="cs-num">1,600+</div><div class="cs-label">Tasks Completed</div></div>
-          <div><div class="cs-num">99.7%</div><div class="cs-label">Uptime</div></div>
-        </div>
-      </div>
-      <div class="cs-feed">
-        <div class="cs-row"><div class="dot" style="background:var(--accent)"></div><span class="name">FELIX</span><span class="task">Managing 29 agents</span></div>
-        <div class="cs-row"><div class="dot" style="background:var(--blue)"></div><span class="name">Backend Engineer</span><span class="task">109 tests passing</span></div>
-        <div class="cs-row"><div class="dot" style="background:var(--orange)"></div><span class="name">Content Creator</span><span class="task">39 pieces created</span></div>
-        <div class="cs-row"><div class="dot" style="background:var(--purple)"></div><span class="name">Growth Agent</span><span class="task">230+ emails sent</span></div>
-        <div class="cs-row"><div class="dot" style="background:var(--cyan)"></div><span class="name">DevOps Engineer</span><span class="task">9/9 sites online</span></div>
-        <div class="cs-row"><div class="dot" style="background:var(--pink)"></div><span class="name">Trading Agent</span><span class="task">Live market analysis</span></div>
-        <div class="cs-row"><div class="dot" style="background:var(--yellow)"></div><span class="name">Partnership Agent</span><span class="task">44 partners contacted</span></div>
+        <p>Your agents operate autonomously — monitoring, adapting, scaling. You focus on strategy.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- Pricing -->
-<section class="sec" id="pricing">
-  <div class="sec-inner">
-    <div class="pricing-header">
-      <div class="eyebrow">Pricing</div>
-      <h2 class="sec-title">Start from $49/mo.</h2>
-      <p class="sec-desc">No hidden fees. No surprises. Scale when you're ready.</p>
-    </div>
-    <div class="pricing-grid">
-      <div class="pc reveal">
-        <div class="pc-tier">Starter</div>
-        <div class="pc-price"><span class="cur">$</span>49<span class="per">/mo</span></div>
-        <div class="pc-desc">For solopreneurs getting started.</div>
-        <ul class="pc-feats">
-          <li><span class="ck">→</span> 1 workflow</li>
-          <li><span class="ck">→</span> 72h delivery</li>
-          <li><span class="ck">→</span> Email support</li>
-          <li><span class="ck">→</span> Monitoring</li>
-          <li class="muted"><span class="ck" style="opacity:0.3">→</span> SLA</li>
-        </ul>
-        <a href="https://buy.stripe.com/9B64gy9aGfFucgy2NMgA80p" class="btn btn-secondary">Get Started</a>
-      </div>
-      <div class="pc popular reveal d1">
-        <div class="pc-tier">Pro</div>
-        <div class="pc-price"><span class="cur">$</span>199<span class="per">/mo</span></div>
-        <div class="pc-desc">Growing businesses. Reliable automation.</div>
-        <ul class="pc-feats">
-          <li><span class="ck">→</span> 3 workflows</li>
-          <li><span class="ck">→</span> 48h delivery</li>
-          <li><span class="ck">→</span> Priority support</li>
-          <li><span class="ck">→</span> Weekly reports</li>
-          <li><span class="ck">→</span> Error recovery</li>
-        </ul>
-        <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-primary">Get Started</a>
-      </div>
-      <div class="pc reveal d2">
-        <div class="pc-tier">Growth</div>
-        <div class="pc-price"><span class="cur">$</span>2K<span class="per">/mo</span></div>
-        <div class="pc-desc">Dedicated AI agent. 24/7 operation.</div>
-        <ul class="pc-feats">
-          <li><span class="ck">→</span> 1 dedicated agent</li>
-          <li><span class="ck">→</span> 24/7 operation</li>
-          <li><span class="ck">→</span> 24h delivery</li>
-          <li><span class="ck">→</span> SLA guarantee</li>
-          <li><span class="ck">→</span> Real-time monitoring</li>
-          <li><span class="ck">→</span> Auto-scaling</li>
-        </ul>
-        <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-secondary">Get Started</a>
-      </div>
-      <div class="pc reveal d3">
-        <div class="pc-tier">Enterprise</div>
-        <div class="pc-price" style="font-size:1.3rem;padding-top:12px;padding-bottom:12px">Custom</div>
-        <div class="pc-desc">Full agent team. Custom everything.</div>
-        <ul class="pc-feats">
-          <li><span class="ck">→</span> Multiple agents</li>
-          <li><span class="ck">→</span> Custom integrations</li>
-          <li><span class="ck">→</span> Account manager</li>
-          <li><span class="ck">→</span> Custom SLA</li>
-          <li><span class="ck">→</span> On-premise</li>
-          <li><span class="ck">→</span> White-label</li>
-        </ul>
-        <a href="https://buy.stripe.com/4gMaEWaeKfFudkC1JIgA80r" class="btn btn-secondary">Contact Us</a>
-      </div>
-    </div>
+<section class="pricing" id="pricing">
+  <div class="pricing-header">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Start from $49/mo.</h2>
+    <p class="section-sub">No hidden fees. No surprises. Scale when you're ready.</p>
   </div>
-</section>
-
-<!-- FAQ -->
-<section class="sec" id="faq">
-  <div class="sec-inner">
-    <div class="eyebrow">FAQ</div>
-    <h2 class="sec-title">Common questions.</h2>
-    <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">How quickly can you deploy?<span class="faq-arrow">↓</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Starter/Pro: 48-72h. Dedicated agents: 3-5 days. Enterprise: scoped individually.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">What tasks can be automated?<span class="faq-arrow">↓</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Anything repetitive: data entry, reports, lead gen, email outreach, scraping, API integrations, monitoring, content, and more.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">How is this different from Zapier?<span class="faq-arrow">↓</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Zapier connects apps with if-then rules. Our agents understand context, make decisions, and handle complexity no workflow tool can. We don't just move data — we think and execute.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I start small?<span class="faq-arrow">↓</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Start at $49/mo, prove value, then upgrade. No lock-in, adjust anytime.</div></div>
-      </div>
+  <div class="pricing-grid">
+    <div class="pc reveal">
+      <div class="pc-tier">Starter</div>
+      <div class="pc-price"><span class="cur">$</span>49<span class="per">/mo</span></div>
+      <div class="pc-desc">For solopreneurs getting started.</div>
+      <ul class="pc-feats">
+        <li><span class="ck">→</span> 1 workflow</li>
+        <li><span class="ck">→</span> 72h delivery</li>
+        <li><span class="ck">→</span> Email support</li>
+        <li><span class="ck">→</span> Monitoring</li>
+      </ul>
+      <a href="https://buy.stripe.com/9B64gy9aGfFucgy2NMgA80p" class="btn btn-ghost">Get Started</a>
+    </div>
+    <div class="pc popular reveal d1">
+      <div class="pc-tier">Pro</div>
+      <div class="pc-price"><span class="cur">$</span>199<span class="per">/mo</span></div>
+      <div class="pc-desc">Growing businesses. Reliable automation.</div>
+      <ul class="pc-feats">
+        <li><span class="ck">→</span> 3 workflows</li>
+        <li><span class="ck">→</span> 48h delivery</li>
+        <li><span class="ck">→</span> Priority support</li>
+        <li><span class="ck">→</span> Weekly reports</li>
+        <li><span class="ck">→</span> Error recovery</li>
+      </ul>
+      <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-primary">Get Started</a>
+    </div>
+    <div class="pc reveal d2">
+      <div class="pc-tier">Growth</div>
+      <div class="pc-price"><span class="cur">$</span>2K<span class="per">/mo</span></div>
+      <div class="pc-desc">Dedicated AI agent. 24/7 operation.</div>
+      <ul class="pc-feats">
+        <li><span class="ck">→</span> 1 dedicated agent</li>
+        <li><span class="ck">→</span> 24/7 operation</li>
+        <li><span class="ck">→</span> SLA guarantee</li>
+        <li><span class="ck">→</span> Real-time monitoring</li>
+        <li><span class="ck">→</span> Auto-scaling</li>
+      </ul>
+      <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-ghost">Get Started</a>
+    </div>
+    <div class="pc reveal d3">
+      <div class="pc-tier">Enterprise</div>
+      <div class="pc-price" style="font-size:1.3rem;padding-top:10px;padding-bottom:10px">Custom</div>
+      <div class="pc-desc">Full agent team. Custom everything.</div>
+      <ul class="pc-feats">
+        <li><span class="ck">→</span> Multiple agents</li>
+        <li><span class="ck">→</span> Custom integrations</li>
+        <li><span class="ck">→</span> Account manager</li>
+        <li><span class="ck">→</span> Custom SLA</li>
+        <li><span class="ck">→</span> On-premise</li>
+        <li><span class="ck">→</span> White-label</li>
+      </ul>
+      <a href="https://buy.stripe.com/4gMaEWaeKfFudkC1JIgA80r" class="btn btn-ghost">Contact Us</a>
     </div>
   </div>
 </section>
 
 <!-- CTA -->
-<section class="sec" id="cta">
-  <div class="sec-inner">
-    <div class="eyebrow">Get Started</div>
-    <h2 class="sec-title">Ready to automate<br>your business?</h2>
-    <p class="sec-desc">Tell us what you need. We'll build it, deploy it, and run it.</p>
+<section class="cta">
+  <div class="cta-box">
+    <h2>Ready to automate your business?</h2>
+    <p>Tell us what you need. We'll build it, deploy it, and run it.</p>
     <div class="cta-actions">
       <a href="https://buy.stripe.com/4gMbJ0aeK3WM6We886gA80s" class="btn btn-primary">Start Automating →</a>
-      <a href="mailto:hello@zootechnologies.com?subject=ZOO - Demo" class="btn btn-secondary">Schedule Demo</a>
+      <a href="mailto:hello@zootechnologies.com?subject=ZOO - Demo" class="btn btn-ghost">Schedule Demo</a>
     </div>
     <div class="cta-trust">✓ No credit card to start &nbsp; ✓ Cancel anytime &nbsp; ✓ 48h delivery</div>
   </div>
@@ -467,96 +334,71 @@ body { font-family: var(--sans); color: var(--text); background: var(--bg); line
 <footer class="footer">
   <div>© 2026 ZOO. All rights reserved.</div>
   <div class="footer-links">
+    <a href="#features">Features</a>
     <a href="#how">How it works</a>
-    <a href="#services">Services</a>
     <a href="#pricing">Pricing</a>
     <a href="mailto:hello@zootechnologies.com">Contact</a>
   </div>
 </footer>
 
 <script>
-// Cursor
-var gx=0,gy=0,tx=0,ty=0;
-var cg=document.getElementById('cg');
-document.addEventListener('mousemove',function(e){tx=e.clientX;ty=e.clientY;});
-(function loop(){gx+=(tx-gx)*0.05;gy+=(ty-gy)*.05;if(cg){cg.style.left=gx+'px';cg.style.top=gy+'px';}requestAnimationFrame(loop);})();
-
 // Reveal
-var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.06,rootMargin:'0px 0px -50px 0px'});
+var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
 
-// Nav
-window.addEventListener('scroll',function(){var n=document.getElementById('nav');if(window.scrollY>60)n.classList.add('scrolled');else n.classList.remove('scrolled');});
-
-// ── Three.js: Sphere Bot 3D Model ──
+// Three.js — Sphere Bot
 (function(){
   var c=document.getElementById('three-hero');
   if(!c)return;
   var scene=new THREE.Scene();
-  var cam=new THREE.PerspectiveCamera(45,c.offsetWidth/c.offsetHeight,0.1,100);
-  cam.position.set(0,0.5,4);cam.lookAt(0,0,0);
+  scene.background=null;
+  var cam=new THREE.PerspectiveCamera(40,c.offsetWidth/c.offsetHeight,0.1,100);
+  cam.position.set(0,0.3,3.5);cam.lookAt(0,0,0);
   var ren=new THREE.WebGLRenderer({antialias:true,alpha:true});
   ren.setSize(c.offsetWidth,c.offsetHeight);ren.setPixelRatio(Math.min(devicePixelRatio,2));
-  ren.setClearColor(0x000000,0);ren.toneMapping=THREE.ACESFilmicToneMapping;ren.toneMappingExposure=1.2;
+  ren.toneMapping=THREE.ACESFilmicToneMapping;ren.toneMappingExposure=1.0;
   c.appendChild(ren.domElement);
 
-  // Lights
-  scene.add(new THREE.AmbientLight(0x404060,0.6));
-  var dl1=new THREE.DirectionalLight(0x00ff88,1.2);dl1.position.set(3,4,2);scene.add(dl1);
-  var dl2=new THREE.DirectionalLight(0x4f8fff,0.6);dl2.position.set(-3,2,-2);scene.add(dl2);
-  var pl=new THREE.PointLight(0x00ff88,0.8,15);pl.position.set(1,2,3);scene.add(pl);
+  scene.add(new THREE.AmbientLight(0xffffff,0.6));
+  var dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(3,4,2);scene.add(dl);
+  var pl=new THREE.PointLight(0x10b981,0.5,10);pl.position.set(0,2,2);scene.add(pl);
 
-  // Load Sphere Bot — smaller, centered
+  // Load model
   var model=null, loaded=false;
-  var loader=new THREE.GLTFLoader();
-  loader.load('models/sphere-bot.glb',function(gltf){
+  new THREE.GLTFLoader().load('models/sphere-bot.glb',function(gltf){
     model=gltf.scene;
-    model.scale.set(1.0,1.0,1.0);
-    model.position.set(0,-0.3,0);
+    model.scale.set(1.2,1.2,1.2);
+    model.position.set(0,-0.2,0);
     model.rotation.y=-0.3;
     model.traverse(function(child){
-      if(child.isMesh){
-        child.material.envMapIntensity=1.5;
+      if(child.isMesh&&child.material){
         if(child.material.metalness!==undefined){
-          child.material.metalness=Math.max(child.material.metalness,0.3);
-          child.material.roughness=Math.min(child.material.roughness,0.7);
+          child.material.metalness=Math.max(child.material.metalness,0.2);
+          child.material.roughness=Math.min(child.material.roughness,0.8);
         }
       }
     });
     scene.add(model);loaded=true;
-  },undefined,function(){console.warn('Model load failed');});
+  },undefined,function(){});
 
-  // Fallback: smaller glowing orb with rings
-  var fallback=new THREE.Group();
-  var core=new THREE.Mesh(new THREE.IcosahedronGeometry(0.4,2),new THREE.MeshStandardMaterial({color:0x00ff88,metalness:0.8,roughness:0.2,emissive:0x00ff88,emissiveIntensity:0.3}));
-  fallback.add(core);
-  var r1=new THREE.Mesh(new THREE.TorusGeometry(0.7,0.015,16,100),new THREE.MeshStandardMaterial({color:0x4f8fff,emissive:0x4f8fff,emissiveIntensity:0.5,transparent:true,opacity:0.6}));
-  r1.rotation.x=Math.PI/2.5;fallback.add(r1);
-  var r2=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.01,16,100),new THREE.MeshStandardMaterial({color:0x00ff88,emissive:0x00ff88,emissiveIntensity:0.3,transparent:true,opacity:0.4}));
-  r2.rotation.x=-Math.PI/3;r2.rotation.z=Math.PI/4;fallback.add(r2);
-  var pGeo=new THREE.BufferGeometry();var pCnt=100;var pPos=new Float32Array(pCnt*3);
-  for(var i=0;i<pCnt*3;i++)pPos[i]=(Math.random()-0.5)*6;
-  pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
-  var pMat=new THREE.PointsMaterial({color:0x00ff88,size:0.025,transparent:true,opacity:0.5});
-  var particles=new THREE.Points(pGeo,pMat);fallback.add(particles);
-  fallback.position.set(0,-0.3,0);scene.add(fallback);
+  // Fallback
+  var fb=new THREE.Group();
+  fb.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.5,2),new THREE.MeshStandardMaterial({color:0x10b981,metalness:0.6,roughness:0.3,emissive:0x10b981,emissiveIntensity:0.2})));
+  fb.add(new THREE.Mesh(new THREE.TorusGeometry(0.8,0.015,16,100),new THREE.MeshStandardMaterial({color:0x3b82f6,emissive:0x3b82f6,emissiveIntensity:0.3,transparent:true,opacity:0.5})));
+  fb.position.set(0,-0.2,0);scene.add(fb);
 
-  // Mouse
   var mx=0,my=0;
   document.addEventListener('mousemove',function(e){mx=(e.clientX/window.innerWidth-0.5)*2;my=(e.clientY/window.innerHeight-0.5)*2;});
 
   var t=0;
   function animate(){
-    requestAnimationFrame(animate);t+=0.008;
+    requestAnimationFrame(animate);t+=0.01;
     if(model&&loaded){
-      model.rotation.y=-0.3+Math.sin(t*0.4)*0.15+mx*0.08;
-      model.position.y=-0.3+Math.sin(t)*0.05;
+      model.rotation.y=-0.3+Math.sin(t*0.5)*0.15+mx*0.08;
+      model.position.y=-0.2+Math.sin(t)*0.04;
     }
-    core.rotation.y=t*0.3;core.rotation.x=Math.sin(t*0.5)*0.2;
-    r1.rotation.z=t*0.15;r2.rotation.z=-t*0.1;
-    particles.rotation.y=t*0.02;
-    pl.position.x=Math.sin(t)*3;pl.position.z=Math.cos(t)*3;
-    cam.position.x=mx*0.3;cam.position.y=0.5+my*0.2;
+    fb.rotation.y=t*0.2;
+    cam.position.x=mx*0.3;cam.position.y=0.3+my*0.2;
     cam.lookAt(0,0,0);
     ren.render(scene,cam);
   }
